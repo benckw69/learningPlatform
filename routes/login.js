@@ -10,23 +10,29 @@ const bcrypt = require('bcrypt');
 /* GET login page. */
 router.get('/',(req,res)=>{
   if(req.session.user) res.redirect('/');
-  else res.render('login');
+  else if(req.query.error==1)res.render('login',{errorMsg:"密碼輸入錯誤"});
+  else if(req.query.error==2)res.render('login',{errorMsg:"電郵地址輸入錯誤"});
+  else res.render('login',{errorMsg:""});
 
 }).post('/', async (req,res)=>{
   //handle login request
-
   let type;
   if(req.query.type) type=req.query.type;
+
+  let email = req.body.email, password = req.body.password;
   //take data from database to check whether can login
   try {
     await client.connect();
     const users = client.db("learningPlatform").collection("users");
-    let user = await users.findOne({email:req.body.email, password:req.body.password, type:type});
+    let user = await users.findOne({email:email, type:type});
     
     if(user){
-      req.session.user = user;
-      res.redirect('/');
-    } else res.redirect('/login?type='+type+'&error=true');
+      if(bcrypt.compareSync(password, user.password)){
+        req.session.user = user;
+        res.redirect('/');
+      }
+      else res.redirect('/login?type='+type+'&error=1');
+    } else res.redirect('/login?type='+type+'&error=2');
   } finally {
       await client.close();
   }

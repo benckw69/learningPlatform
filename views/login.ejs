@@ -23,17 +23,17 @@
         <div>
           <p id="haveAccountText">已經有帳戶?請<a href="/" id="registerAction">註冊</a></p>
         </div>
+        <p><a href="/" id="anotherLogin"></a></p>
         <div >
           <p><a href="/">回到主頁</a></p>
         </div>
       </div>
     
     </form> 
-    <label for="uname" style="display:none" id="error"><b>電郵地址或密碼輸入錯誤</b></label>
+    <label for="uname" style="display:none" id="error"><b>登入失敗：<%= errorMsg %></b></label>
     
     <script>
       const searchParams = new URLSearchParams(window.location.search);
-
       if(searchParams.get('error')){
         document.getElementById('error').style.display = "initial";
       }
@@ -42,16 +42,21 @@
 
       if(searchParams.get('type')=="student"){
         document.getElementById('loginText').textContent = "學生登入";
+        document.getElementById('anotherLogin').textContent = "老師登入";
         document.getElementById('registerAction').setAttribute("href","/register?type=student");
         document.getElementById('form').setAttribute("action","/login?type=student");
+        document.getElementById('anotherLogin').setAttribute("href","/login?type=teacher");
       } else if (searchParams.get('type')=="teacher") {
         document.getElementById('loginText').textContent = "老師登入";
+        document.getElementById('anotherLogin').textContent = "學生登入";
         document.getElementById('registerAction').setAttribute("href","/register?type=teacher");
         document.getElementById('form').setAttribute("action","/login?type=teacher");
+        document.getElementById('anotherLogin').setAttribute("href","/login?type=student");
       } else if (searchParams.get('type')=="admin"){
         document.getElementById('loginText').textContent = "管理者登入";
         document.getElementById('form').setAttribute("action","/login?type=admin");
         document.getElementById('haveAccountText').style.display = "none";
+        document.getElementById('anotherLogin').style.display = "none";
       } 
 
     </script>
