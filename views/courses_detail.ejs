@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>學習網站 - 查看所有課程</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>學習網站</h1>
+    你好，<%= user.username %>。 <a href="/courses">瀏覽所有課程</a> <a href="/courses/paid">瀏覽已付費課程</a> <a href="/users">個人資料</a> <a href="/moneyTickets/insert">輸入現金卷</a> <a href="/logout">登出</a>
+    <p style="display:none" id="checkLogin" paid="<%= paid %>"></p>
+
+    <ul>
+          <li><a href="<%= course.videoLink %>" target="_blank"><img src="<%= course.photoLink %>" height="200" width="200"></a></li>
+          <li>Course Name: <%= course.name %></li>
+          <li>Author: <%= course.author %></li>
+          <li>Money: <%= course.money %> </li>
+          <li>Introduction: <%= course.introduction %></li>
+          <li>Content: <%= course.content %></li>
+          <li id="paid" style="display:none">Video link: <a href="<%= course.videoLink %>" target="_blank"><%= course.videoLink %></a></li>
+        
+          <li id="notpaid" style="display:none"><a href='/courses/<%= course._id %>/buy'>購買課程</a></li>
+          
+          
+    </ul>
+  </body>
+</html>
+<script>
+  let checkLogin = document.getElementById('checkLogin');
+
+  if(checkLogin.getAttribute("paid") == "true"){
+    document.getElementById('paid').style.display = "initial";
+  } else {
+    document.getElementById('notpaid').style.display = "initial";
+  }
+
+</script>

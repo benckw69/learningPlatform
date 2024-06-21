@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>學習網站</title>
+    <link rel='stylesheet' href='/stylesheets/userView.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>學習網站</h1>
+
+    <div>你好，<%= user.username %>。 <a href="/courses">瀏覽所有課程</a> <a href="/courses/paid">瀏覽已付費課程</a> <a href="/users">個人資料</a> <a href="/moneyTickets/insert">輸入現金卷</a> <a href="/logout">登出</a></div>
+    <form action="/users/edit/personalInfo" method="post">
+      <div class="container">
+        <h1>更改個人資料</h1>
+        <hr>
+    
+        <label for="email"><b>電郵地址</b></label>
+        <input type="text" name="email" value="<%= user.email %>" required>
+    
+        <label for="username"><b>用戶名稱</b></label>
+        <input type="text" name="username" value="<%= user.username %>" required>
+
+        <label for="username"><b>密碼</b></label>
+        <input type="password" name="password" required>
+
+        <button type="submit" class="registerbtn" >更改資料</button>
+        
+        <button type="button" class="registerbtn" style="background-color:blue" onclick="window.location.href='/users'">回到上一頁</button>
+      </div>
+      <label for="uname" style="display:none" id="errorFalseText"><b>更改資料成功</b></label>
+      <label for="uname" style="display:none" id="errorTrueText"><b>更改資料失敗</b></label>
+
+ 
+    
+    </form>
+    
+    
+  </body>
+
+  <script>
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if(searchParams.get('error')=="true"){
+        document.getElementById('error').style.display = "initial";
+    } 
+    else if(searchParams.get('error')=="false"){
+        document.getElementById('errorFalseText').style.display = "initial";
+    }
+  </script>
+   
+</html>

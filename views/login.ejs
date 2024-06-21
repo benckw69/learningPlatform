@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>登入 - 學習網站</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/userView.css' />
+  </head>
+  <body>
+    <h1>學習網站</h1>
+    <h2 id="loginText">登入</h2>
+      <form id="form" action="/" method="post">
+      
+    
+      <div class="container">    
+        <label for="uname"><b>電郵地址</b></label>
+        <input type="text" placeholder="輸入電郵" name="email" required>
+        <br/>
+        <label for="psw"><b>密碼</b></label>
+        <input type="password" placeholder="輸入密碼" name="password" required>
+    
+        <button type="submit" class="registerbtn">登入</button>
+        <br/>
+        <div>
+          <p id="haveAccountText">已經有帳戶?請<a href="/" id="registerAction">註冊</a></p>
+        </div>
+        <div >
+          <p><a href="/">回到主頁</a></p>
+        </div>
+      </div>
+    
+    </form> 
+    <label for="uname" style="display:none" id="error"><b>電郵地址或密碼輸入錯誤</b></label>
+    
+    <script>
+      const searchParams = new URLSearchParams(window.location.search);
+
+      if(searchParams.get('error')){
+        document.getElementById('error').style.display = "initial";
+      }
+
+      let checkLogin = document.getElementById('checktype');
+
+      if(searchParams.get('type')=="student"){
+        document.getElementById('loginText').textContent = "學生登入";
+        document.getElementById('registerAction').setAttribute("href","/register?type=student");
+        document.getElementById('form').setAttribute("action","/login?type=student");
+      } else if (searchParams.get('type')=="teacher") {
+        document.getElementById('loginText').textContent = "老師登入";
+        document.getElementById('registerAction').setAttribute("href","/register?type=teacher");
+        document.getElementById('form').setAttribute("action","/login?type=teacher");
+      } else if (searchParams.get('type')=="admin"){
+        document.getElementById('loginText').textContent = "管理者登入";
+        document.getElementById('form').setAttribute("action","/login?type=admin");
+        document.getElementById('haveAccountText').style.display = "none";
+      } 
+
+    </script>
+  </body>

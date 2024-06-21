@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>學習網站</title>
+        <link rel='stylesheet' href='/stylesheets/userView.css' />
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+    </head>
+    <body>
+        <h1>學習網站</h1>
+        你好，<%= user.username %>。 <a href="/moneyTickets/view">查看現金卷</a> <a href="/moneyTickets/new">輸入現金卷</a> <a href="/users">個人資料</a> <a href="/logout">登出</a>
+        <form action="/moneyTickets/new" method="post">
+            <div class="container">
+            <h1>添加使用卷</h1>
+            <label for="email"><b>換領代碼</b></label>
+            <input type="text" name="code" required>
+            <label for="name"><b>面額</b></label>
+            <input type="text" name="money" required>
+            <button type="submit" class="registerbtn" >更改資料</button>
+            </div>
+            <label for="uname" style="display:none" id="errorFalseText"><b>添加資料成功</b></label>
+            <label for="uname" style="display:none" id="errorTrueText"><b>添加資料失敗，請再嘗試</b></label>
+        </form>
+    </body>
+    <script>
+        const searchParams = new URLSearchParams(window.location.search);
+        
+        if(searchParams.get('error')=="true"){
+            document.getElementById('errorTrueText').style.display = "initial";
+        } 
+        else if(searchParams.get('error')=="false"){
+            document.getElementById('errorFalseText').style.display = "initial";
+        }
+    </script>
+</html>

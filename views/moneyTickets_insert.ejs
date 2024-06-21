@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <title>學習網站</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/userView.css' />
+  </head>
+  <body>
+    <h1>學習網站</h1>
+
+    你好，<%= user.username %>。 <a href="/courses">瀏覽所有課程</a> <a href="/courses/myCourse">瀏覽已付費課程</a> <a href="/users">個人資料</a> <a href="/moneyTickets/insert">輸入現金卷</a> <a href="/logout">登出</a>
+    
+    <form action="/moneyTickets/insert" method="post">
+      <div class="container">
+        <h1>輸入現金卷</h1>
+        <hr>
+    
+        <label for="email"><b>現金卷號碼</b></label>
+        <input type="text" placeholder="輸入現金卷號碼" name="ticketNum" id="ticketNum" required>
+    
+        <button type="submit" class="registerbtn">送出</button>
+      </div>
+    
+    </form>
+    <label for="uname" style="display:none" id="errorFalseText"><b>成功兌換現金卷</b></label>
+    <label for="uname" style="display:none" id="erroTrueText"><b>兌換現金卷失敗，請再嘗試</b></label>
+  
+    
+  </body>
+
+  <script>
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if(searchParams.get('error')=="true"){
+      document.getElementById('erroTrueText').style.display = "initial";
+    }
+    else if(searchParams.get('error')=="false"){
+      document.getElementById('errorFalseText').style.display = "initial";
+    }
+  </script>
+   
+</html>

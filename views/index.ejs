@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+
+    <div id="login" style="display:none">你好，<%= user.username %>。<%- menuBar %></div>
+    <div id="notLogin" style="display:none"><a href="/login?type=student">學生登入</a> <a href="/login?type=teacher">老師登入</a>  <a href="/register?type=student">學生註冊</a> <a href="/register?type=teacher">老師註冊</a></div> 
+    <p style="display:none" id="checkLogin" type="<%= user.type %>"></p>
+    <br/><br/><h2 style="display:none" id="deleteText">你的帳戶已被刪除</h2>
+    
+  </body>
+
+  <script>
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if(searchParams.get('delete')=="true"){
+      document.getElementById('deleteText').style.display = "initial";
+    }
+
+    let checkLogin = document.getElementById('checkLogin');
+    if(checkLogin.getAttribute("type")){
+      document.getElementById('login').style.display = "initial";
+    } else {
+      document.getElementById('notLogin').style.display = "initial";
+    }
+
+  </script>
+   
+</html>
