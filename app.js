@@ -31,6 +31,7 @@ app.use('/register', registerRouter);
 app.use('/users', usersRouter);
 app.use('/courses',coursesRouter);
 app.use('/moneyTickets',require('./routes/moneyTickets'));
+app.use('/game',require('./routes/game'));
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
