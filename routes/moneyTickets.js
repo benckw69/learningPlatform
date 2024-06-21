@@ -1,6 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
+const MongoClient = require('mongodb').MongoClient;
+const config = require('./config');
+const client = new MongoClient(config.url);
+
 /*  */
 router.get('/', (req, res) => {
   if(req.session.user) {
