@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb+srv://benckw69:thrawN1996@cluster0.xhaav3r.mongodb.net/";
+const url = "mongodb+srv://benckw69:Xp8HRCGYad@cluster0.xhaav3r.mongodb.net/";
 const client = new MongoClient(url);
 let validator = require('email-validator');
+const bcrypt = require('bcrypt');
 
 router.get('/',(req,res)=>{
 
@@ -43,7 +44,10 @@ router.get('/',(req,res)=>{
       if(userExist) res.redirect('/register?type='+type+'&error=3');
       else {
         //insert data into database
-        let userData = {type:type, email:req.body.email, username:username, password:password};
+        const saltRounds = 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(password, salt);
+        let userData = {type:type, email:req.body.email, username:username, password:hash};
         if(type == "student" || type == "teacher") userData.money = 0;
         if(type == "teacher") userData.introduction = "";
         const user = await users_c.insertOne(userData);
@@ -52,7 +56,7 @@ router.get('/',(req,res)=>{
           const newUser = await users_c.findOne({email:email});
           if(newUser) {
             req.session.user = newUser;
-            res.redirect('/?login='+username+'&type='+type+'&id='+newUser._id.toString());
+            res.redirect('/');
           }
           else res.redirect('/register?type='+type+'&error=5');
         }

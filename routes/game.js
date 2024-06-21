@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb+srv://benckw69:thrawN1996@cluster0.xhaav3r.mongodb.net/";
+const url = "mongodb+srv://benckw69:Xp8HRCGYad@cluster0.xhaav3r.mongodb.net/";
 const client = new MongoClient(url);
 const ObjectId = require('mongodb').ObjectId;
 const menuId = new ObjectId("6674d5e69626bba98ce76506");

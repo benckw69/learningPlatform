@@ -1,6 +1,0 @@
-npm install express-generator
-
-npm install nodemon
-npm install express-session
-npm install mongodb
-npm install email-validator

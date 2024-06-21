@@ -3,7 +3,7 @@ var router = express.Router();
 
 const MongoClient = require('mongodb').MongoClient;
 //const url = "mongodb://localhost:27017/";
-const url = "mongodb+srv://benckw69:thrawN1996@cluster0.xhaav3r.mongodb.net/";
+const url = "mongodb+srv://benckw69:Xp8HRCGYad@cluster0.xhaav3r.mongodb.net/";
 const client = new MongoClient(url);
 const ObjectId = require('mongodb').ObjectId;
 
