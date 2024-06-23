@@ -17,7 +17,7 @@ router.get('/',async (req,res)=>{
             await client.connect();
             const courses_c = client.db("learningPlatform").collection("courses");
             courses = await courses_c.find().toArray();
-            if(courses) res.render('courses_all',{user:req.session.user, courses:courses});
+            if(courses) res.render('courses_all',{user:req.session.user, courses:courses, title:config.title});
         } finally {
             await client.close();
         }
@@ -39,10 +39,10 @@ router.get('/',async (req,res)=>{
                     let data1 = await courses_c.findOne({_id:i.courseId});
                     if(data1) courses.push(data1);
                 }
-                res.render('courses_paid',{user:req.session.user, courses:courses});
+                res.render('courses_paid',{user:req.session.user, courses:courses, title:config.title});
             }
             else {
-                res.render('courses_paid',{user:req.session.user, courses:[], message:"你沒有任何購買紀錄！"});
+                res.render('courses_paid',{user:req.session.user, courses:[], message:"你沒有任何購買紀錄！", title:config.title});
             }
         } finally{
             await client.close();
@@ -78,7 +78,7 @@ router.get('/',async (req,res)=>{
         }
         ]
 
-        res.render('courses_myCourses',{user:req.session.user, courses:courses});
+        res.render('courses_myCourses',{user:req.session.user, courses:courses, title:config.title});
     }
     else res.redirect('/');
 }).get('/myCourses/:courseId',(req,res)=>{
@@ -111,7 +111,7 @@ router.get('/',async (req,res)=>{
                 category:"music"
             }
         }
-        res.render('courses_myCourses_edit',{user:req.session.user, course:course, courseId:req.params.courseId});
+        res.render('courses_myCourses_edit',{user:req.session.user, course:course, courseId:req.params.courseId, title:config.title});
     }
     else res.redirect('/');
 }).post('/myCourses/:courseId',(req,res)=>{
@@ -141,8 +141,8 @@ router.get('/',async (req,res)=>{
 
                     const buyRecords_c = client.db("learningPlatform").collection("buyRecords");  
                     let buyRecords = await buyRecords_c.findOne({courseId:course._id, userId:userId});
-                    if(buyRecords) res.render('courses_detail',{user:req.session.user, course:course, paid:true});
-                    else res.render('courses_detail',{user:req.session.user, course:course, paid:false});
+                    if(buyRecords) res.render('courses_detail',{user:req.session.user, course:course, paid:true, title:config.title});
+                    else res.render('courses_detail',{user:req.session.user, course:course, paid:false, title:config.title});
                 }
             }
             else res.redirect('/');
@@ -157,7 +157,7 @@ router.get('/',async (req,res)=>{
     //insert buy record at database.  Need edit
     
         let canBuy = true;
-        res.render('courses_detail',{user:req.session.user, course:course});
+        res.render('courses_detail',{user:req.session.user, course:course, title:config.title});
     }
     else res.redirect('/');
 });

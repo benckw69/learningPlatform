@@ -16,7 +16,7 @@ router.get('/', async (req, res)=> {
         console.log(menuCode);
         if(menuCode){
             if(req.session.user && req.session.user.type=="student") {
-                res.render("game",{user:req.session.user, menuBar:menuCode.student_menuBar, title:menuCode.title});
+                res.render("game",{user:req.session.user, menuBar:menuCode.student_menuBar, title:menuCode.title, title:config.title});
             }
           else res.redirect("/");
         } else res.send("網站錯誤");

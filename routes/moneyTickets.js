@@ -8,14 +8,14 @@ const client = new MongoClient(config.url);
 /*  */
 router.get('/', (req, res) => {
   if(req.session.user) {
-    res.render('moneyTickets_insert', { user:req.session.user });
+    res.render('moneyTickets_insert', { user:req.session.user, title:config.title });
   }
   else res.redirect('/');
 
 }).post('/', (req, res) => {
   if(req.session.user) {
     //need edit
-    res.render('moneyTickets_insert', { user:req.session.user });
+    res.render('moneyTickets_insert', { user:req.session.user, title:config.title });
     let changeTicket = true;
 
   //connect to the database to see if ticket exist.  If exist, delete the ticket and add the money to the user
@@ -24,13 +24,13 @@ router.get('/', (req, res) => {
   }
   else res.redirect('/');
 }).get('/insert',(req,res)=>{
-  if(req.session.user) res.render('moneyTickets_insert', { user:req.session.user });
+  if(req.session.user) res.render('moneyTickets_insert', { user:req.session.user, title:config.title });
   else res.redirect('/');
 }).get('/view',(req,res)=>{
-  if(req.session.user) res.render('moneyTickets_view', { user:req.session.user, moneyTickets:[{code:"abc123", money:12}] });
+  if(req.session.user) res.render('moneyTickets_view', { user:req.session.user, moneyTickets:[{code:"abc123", money:12}], title:config.title });
   else res.redirect('/');
 }).get('/new',(req,res)=>{
-  if(req.session.user) res.render('moneyTickets_new', { user:req.session.user });
+  if(req.session.user) res.render('moneyTickets_new', { user:req.session.user, title:config.title });
   else res.redirect('/');
 }).post('/new',(req,res)=>{
   if(req.session.user) {

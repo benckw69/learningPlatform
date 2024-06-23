@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>學習網站</title>
+        <title><%= title %> - 新増現金卷</title>
         <link rel='stylesheet' href='/stylesheets/userView.css' />
         <link rel='stylesheet' href='/stylesheets/style.css' />
     </head>
     <body>
-        <h1>學習網站</h1>
-        你好，<%= user.username %>。 <a href="/moneyTickets/view">查看現金卷</a> <a href="/moneyTickets/new">輸入現金卷</a> <a href="/users">個人資料</a> <a href="/logout">登出</a>
+        <h1><%= title %></h1>
+        <%- include('header',{user:user}) %>
         <form action="/moneyTickets/new" method="post">
             <div class="container">
             <h1>添加使用卷</h1>

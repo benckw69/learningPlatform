@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>登入 - 學習網站</title>
+    <title><%= title %> - 登入</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/userView.css' />
   </head>
   <body>
-    <h1>學習網站</h1>
+    <%- include('header',{user:user}) %>
+    <h1><%= title %></h1>
     <h2 id="loginText">登入</h2>
       <form id="form" action="/" method="post">
       
@@ -37,8 +38,6 @@
       if(searchParams.get('error')){
         document.getElementById('error').style.display = "initial";
       }
-
-      let checkLogin = document.getElementById('checktype');
 
       if(searchParams.get('type')=="student"){
         document.getElementById('loginText').textContent = "學生登入";

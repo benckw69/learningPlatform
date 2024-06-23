@@ -1,51 +1,38 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>學習網站 - 註冊</title>
+    <title><%= title %> - 註冊</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/userView.css' />
   </head>
-  <form action="/register?type=<%= type %>" method="post">
-  <div class="container">
-    <h1 id="registerText">註冊</h1>
-    <hr>
+  <body>
+    <form action="/register?type=<%= type %>" method="post">
+    <div class="container">
+      <h1 id="registerText"><%= loginText %></h1>
+      <hr>
 
-    <label for="email"><b>電郵地址</b></label>
-    <input type="text" placeholder="輸入電郵" name="email" id="email" required>
+      <label for="email"><b>電郵地址</b></label>
+      <input type="text" placeholder="輸入電郵" name="email" id="email" required>
 
-    <label for="email"><b>用戶名稱</b></label>
-    <input type="text" placeholder="輸入用戶名稱" name="username" id="username" required>
+      <label for="email"><b>用戶名稱</b></label>
+      <input type="text" placeholder="輸入用戶名稱" name="username" id="username" required>
 
-    <label for="psw"><b>密碼（必須等於或長於8位字元）</b></label>
-    <input type="password" placeholder="輸入密碼" name="password" id="password" required>
+      <label for="psw"><b>密碼（必須等於或長於8位字元）</b></label>
+      <input type="password" placeholder="輸入密碼" name="password" id="password" required>
 
-    <label for="psw-repeat"><b>重覆輸入密碼</b></label>
-    <input type="password" placeholder="輸入密碼" name="password_repeat" id="password_repeat" required>
-    <hr>
+      <label for="psw-repeat"><b>重覆輸入密碼</b></label>
+      <input type="password" placeholder="輸入密碼" name="password_repeat" id="password_repeat" required>
+      <hr>
 
-    <button type="submit" class="registerbtn">註冊</button>
-  </div>
+      <button type="submit" class="registerbtn">註冊</button>
+    </div>
 
-  <div class="container signin">
-    <p>已經有帳戶?請<a href="/login?type=<%= type %>" id="loginAction">登入</a></p>
-  </div>
+    <div class="container signin">
+      <p>已經有帳戶?請<a href="/login?type=<%= type %>" id="loginAction">登入</a></p>
+    </div>
 
-  <label for="uname" style="display:none" id="error"><b>註冊失敗：<%= error %></b></label>
-  <p><a href="/">回到主頁</a></p>
-  </form> 
+    <label for="uname" id="error"><b><%= errorMsg %></b></label>
+    <p><a href="/">回到主頁</a></p>
+    </form> 
+  </body>
 </html>
-
-<script>
-  const searchParams = new URLSearchParams(window.location.search);
-
-  if(searchParams.get('error')){
-    document.getElementById('error').style.display = "initial";
-  }
-
-  if(searchParams.get('type')=="student"){
-   document.getElementById('registerText').textContent = "學生註冊";
-  } else if (searchParams.get('type')=="teacher") {
-   document.getElementById('registerText').textContent = "老師註冊";
-  }
-
-</script>

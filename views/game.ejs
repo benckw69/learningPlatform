@@ -2,13 +2,13 @@
 <html>
   
   <head>
-    <title><%= title %></title>
+    <title><%= title %> - 小遊戲</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
     <h1><%= title %></h1>
 
-    你好，<%= user.username %>。 <%- menuBar %>
+    <%- include('header',{user:user}) %>
     
     
   

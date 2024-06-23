@@ -9,19 +9,20 @@ const bcrypt = require('bcrypt');
 
 router.get('/',(req,res)=>{
 
-  let type, login, id, error;
+  let error, type, loginText;
   if(req.query.type) type=req.query.type;
-  if(req.query.login) login=req.query.login;
-  if(req.query.id) id=req.query.id;
+  if(req.query.type=="student") loginText="學生註冊";
+  else if(req.query.type=="teacher") loginText="老師註冊";
   if(req.query.error) error=req.query.error;
-  if(login || id) res.redirect("/?login="+login+"&type="+type+'&id='+id);
-  else if(error=="1") res.render('register',{type:type, error:"兩個輸入密碼並不一致"});
-  else if(error=="2") res.render('register',{type:type, error:"密碼長度未夠8位"});
-  else if(error=="3") res.render('register',{type:type, error:"電郵地址已經存在"});
-  else if(error=="4") res.render('register',{type:type, error:"未能新増紀錄，請再嘗試"});
-  else if(error=="5") res.render('register',{type:type, error:"未能尋找新増紀錄，請再嘗試"});
-  else if(error=="6") res.render('register',{type:type, error:"電郵地址格式錯誤"});
-  else if(type == "student" || type == "teacher") res.render('register',{type:type, error:""});
+  
+  if(req.session.user) res.redirect("/");
+  else if(error=="1") res.render('register',{loginText, type:type, title:config.title, errorMsg:"註冊失敗：兩個輸入密碼並不一致"});
+  else if(error=="2") res.render('register',{loginText, type:type, title:config.title, errorMsg:"註冊失敗：密碼長度未夠8位"});
+  else if(error=="3") res.render('register',{loginText, type:type, title:config.title, errorMsg:"註冊失敗：電郵地址已經存在"});
+  else if(error=="4") res.render('register',{loginText, type:type, title:config.title, errorMsg:"註冊失敗：未能新増紀錄，請再嘗試"});
+  else if(error=="5") res.render('register',{loginText, type:type, title:config.title, errorMsg:"註冊失敗：未能尋找新増紀錄，請再嘗試"});
+  else if(error=="6") res.render('register',{loginText, type:type, title:config.title, errorMsg:"註冊失敗：電郵地址格式錯誤"});
+  else if(type == "student" || type == "teacher") res.render('register',{loginText, type:type, title:config.title , errorMsg:""});
   else res.redirect('/');
 
 }).post('/', async (req, res) => {
