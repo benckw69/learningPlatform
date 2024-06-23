@@ -1,2 +1,4 @@
 #ignore node module
 node_modules/*
+
+views/test.ejs
