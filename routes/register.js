@@ -41,7 +41,7 @@ router.get('/',(req,res)=>{
       await client.connect();
 
       const users_c = client.db("learningPlatform").collection("users");  
-      const userExist = await users_c.findOne({email:email});
+      const userExist = await users_c.findOne({email:email, type:type});
       if(userExist) res.redirect('/register?type='+type+'&error=3');
       else {
         //insert data into database
@@ -54,7 +54,7 @@ router.get('/',(req,res)=>{
         const user = await users_c.insertOne(userData);
         //check whether data are inserted.  Find back the inserted data
         if(user.acknowledged) {
-          const newUser = await users_c.findOne({email:email});
+          const newUser = await users_c.findOne({email:email, type:type});
           if(newUser) {
             req.session.user = newUser;
             res.redirect('/');

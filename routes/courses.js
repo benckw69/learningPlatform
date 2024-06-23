@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 const MongoClient = require('mongodb').MongoClient;
-//const url = "mongodb://localhost:27017/";
 const config = require('./config');
 const client = new MongoClient(config.url);
 const ObjectId = require('mongodb').ObjectId;
