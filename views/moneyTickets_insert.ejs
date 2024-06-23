@@ -8,7 +8,6 @@
   </head>
   <body>
     <h1><%= title %></h1>
-
     <%- include('header',{user:user}) %>
     
     <form action="/moneyTickets/insert" method="post">
@@ -23,21 +22,6 @@
       </div>
     
     </form>
-    <label for="uname" style="display:none" id="errorFalseText"><b>成功兌換現金卷</b></label>
-    <label for="uname" style="display:none" id="erroTrueText"><b>兌換現金卷失敗，請再嘗試</b></label>
-  
-    
+    <label for="uname"><b><%= msg %></b></label>
   </body>
-
-  <script>
-    const searchParams = new URLSearchParams(window.location.search);
-
-    if(searchParams.get('error')=="true"){
-      document.getElementById('erroTrueText').style.display = "initial";
-    }
-    else if(searchParams.get('error')=="false"){
-      document.getElementById('errorFalseText').style.display = "initial";
-    }
-  </script>
-   
 </html>
