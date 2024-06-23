@@ -6,9 +6,10 @@
     <link rel='stylesheet' href='/stylesheets/userView.css' />
   </head>
   <body>
-    <%- include('header',{user:user}) %>
     <h1><%= title %></h1>
+    <%- include('header',{user:user}) %>
     <h2 id="loginText">登入</h2>
+    <hr>
       <form id="form" action="/" method="post">
       
     
@@ -24,30 +25,22 @@
         <div>
           <p id="haveAccountText">已經有帳戶?請<a href="/" id="registerAction">註冊</a></p>
         </div>
-        <p><a href="/" id="anotherLogin"></a></p>
-        <div >
-          <p><a href="/">回到主頁</a></p>
-        </div>
       </div>
     
     </form> 
-    <label for="uname" id="error"><b><%= errorMsg %></b></label>
+    <label for="uname" ><b><%= msg %></b></label>
     
     <script>
       const searchParams = new URLSearchParams(window.location.search);
 
       if(searchParams.get('type')=="student"){
         document.getElementById('loginText').textContent = "學生登入";
-        document.getElementById('anotherLogin').textContent = "老師登入";
         document.getElementById('registerAction').setAttribute("href","/register?type=student");
         document.getElementById('form').setAttribute("action","/login?type=student");
-        document.getElementById('anotherLogin').setAttribute("href","/login?type=teacher");
       } else if (searchParams.get('type')=="teacher") {
         document.getElementById('loginText').textContent = "老師登入";
-        document.getElementById('anotherLogin').textContent = "學生登入";
         document.getElementById('registerAction').setAttribute("href","/register?type=teacher");
         document.getElementById('form').setAttribute("action","/login?type=teacher");
-        document.getElementById('anotherLogin').setAttribute("href","/login?type=student");
       } else if (searchParams.get('type')=="admin"){
         document.getElementById('loginText').textContent = "管理者登入";
         document.getElementById('form').setAttribute("action","/login?type=admin");

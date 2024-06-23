@@ -6,10 +6,12 @@
     <link rel='stylesheet' href='/stylesheets/userView.css' />
   </head>
   <body>
+    <h1><%= title %></h1>
+    <%- include('header',{user:user}) %>
+    <h2 id="registerText"><%= loginText %></h2>
+    <hr>
     <form action="/register?type=<%= type %>" method="post">
     <div class="container">
-      <h1 id="registerText"><%= loginText %></h1>
-      <hr>
 
       <label for="email"><b>電郵地址</b></label>
       <input type="text" placeholder="輸入電郵" name="email" id="email" required>
@@ -31,8 +33,7 @@
       <p>已經有帳戶?請<a href="/login?type=<%= type %>" id="loginAction">登入</a></p>
     </div>
 
-    <label for="uname" id="error"><b><%= errorMsg %></b></label>
-    <p><a href="/">回到主頁</a></p>
+    <label for="uname" id="error"><b><%= msg %></b></label>
     </form> 
   </body>
 </html>
