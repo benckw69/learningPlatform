@@ -7,15 +7,21 @@ const client = new MongoClient(config.url);
 
 /*  */
 router.get('/insert', (req, res) => {
-  if(req.session.user) res.render('moneyTickets_insert', { user:req.session.user, title:config.title, msg:"" });
-  else res.redirect('/');
+  let msgCode = req.query.msg, msg;
+  if(msgCode=="1") msg= "成功兌換現金卷";
+  else if(msgCode=="2") msg = "兌換現金卷失敗，請再嘗試";
 
-}).post('/', (req, res) => {
+  if(req.session.user){
+    if(req.session.user.type=="student") res.render('moneyTickets_insert', { user:req.session.user, title:config.title, msg:msg });
+    else res.redirect('/');
+  } else res.redirect('/');
+
+}).post('/insert', (req, res) => {
   if(req.session.user) {
     //need edit
     let added = true;
-    if(added) res.render('moneyTickets_insert', { user:req.session.user, title:config.title, msg:"成功兌換現金卷" });
-    else res.render('moneyTickets_insert', { user:req.session.user, title:config.title, msg:"兌換現金卷失敗，請再嘗試" });
+    if(added) res.redirect('/moneyTickets/insert?msg=1');
+    else res.redirect('/moneyTickets/insert?msg=2');
     let changeTicket = true;
 
   //connect to the database to see if ticket exist.  If exist, delete the ticket and add the money to the user
