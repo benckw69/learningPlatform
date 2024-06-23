@@ -10,7 +10,7 @@ const ObjectId = require('mongodb').ObjectId;
 router.get('/', async (req, res) => {
   if(req.session.user) {
 
-    //take data from database
+    //view api.  Take user data from database
     try {
       await client.connect();
       const users_c = client.db("learningPlatform").collection("users");  
@@ -30,17 +30,21 @@ router.get('/', async (req, res) => {
   }
   else res.redirect('/');
 }).get('/edit/personalInfo', async (req, res) => {
+  console.log(req.query.error);
+  let msgCode = req.query.msg, msg;
+  if(msgCode=="1") msg= "更改資料成功";
+  else if(msgCode=="2") msg = "更改資料失敗：密碼錯誤";
   if(req.session.user) {
 
-    //take data from database
+    //edit user info api.  Take user data from database.  Handle error.
     try {
       await client.connect();
       const users_c = client.db("learningPlatform").collection("users");  
       let user = await users_c.findOne({_id:new ObjectId(req.session.user._id)});
       if(user){
-        if(req.session.user.type == "student") res.render('users_edit_student', {user:user, title:config.title});
-        else if(req.session.user.type == "teacher") res.render('users_edit_teacher', {user:user, title:config.title});
-        else if(req.session.user.type == "admin") res.render('users_edit_admin', {user:user, title:config.title});
+        if(req.session.user.type == "student") res.render('users_edit_student', {user:user, title:config.title, msg:msg});
+        else if(req.session.user.type == "teacher") res.render('users_edit_teacher', {user:user, title:config.title, msg:msg});
+        else if(req.session.user.type == "admin") res.render('users_edit_admin', {user:user, title:config.title, msg:msg});
       }
       else res.redirect('/');
     } finally {
@@ -55,14 +59,18 @@ router.get('/', async (req, res) => {
     let data = {type:type, email:req.body.email, username:req.body.username, id:id, money:123}
 
     let canUpdate = true;
-    if(canUpdate ) res.redirect('/users/edit/personalInfo?error=false');
-    else res.redirect('/users/edit/personalInfo?error=true');
+    if(canUpdate ) res.redirect('/users/edit/personalInfo?msg=1');
+    else res.redirect('/users/edit/personalInfo?msg=2');
   }
   res.redirect('/');
     
 }).get('/edit/password',(req,res)=>{
+  let msgCode = req.query.msg, msg;
+  if(msgCode=="1") msg= "更改密碼成功";
+  else if(msgCode=="2") msg = "更改密碼失敗：密碼錯誤";
+  console.log(msg)
   if(req.session.user) {
-    res.render('users_edit_password',{user:req.session.user, title:config.title});
+    res.render('users_edit_password',{user:req.session.user, title:config.title, msg:msg});
   }
   else res.redirect('/');
 
@@ -74,9 +82,9 @@ router.get('/', async (req, res) => {
     if(req.body.password_new != req.body.password_new2) updated = false;
 
 
-    if(updated) res.redirect('/users/edit/password?error=false');
+    if(updated) res.redirect('/users/edit/password?msg=1');
   }
-  else res.redirect('/users/edit/password?error=true');
+  else res.redirect('/users/edit/password?msg=2');
 
 }).get('/delete',(req,res)=>{
   if(req.session.user) {

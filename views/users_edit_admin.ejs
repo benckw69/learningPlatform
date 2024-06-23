@@ -27,25 +27,8 @@
         
         <button type="button" class="registerbtn" style="background-color:blue" onclick="window.location.href='/users?type=<%= type %>&login=<%= login %>&id=<%= id %>'">回到上一頁</button>
       </div>
-      <label for="uname" style="display:none" id="errorFalseText"><b>更改資料成功</b></label>
-      <label for="uname" style="display:none" id="errorTrueText"><b>更改資料失敗</b></label>
-
- 
-    
+      <label for="uname" ><b><%= msg %></b></label>
     </form>
-    
-    
   </body>
-
-  <script>
-    const searchParams = new URLSearchParams(window.location.search);
-
-    if(searchParams.get('error')=="true"){
-        document.getElementById('error').style.display = "initial";
-    } 
-    else if(searchParams.get('error')=="false"){
-        document.getElementById('errorFalseText').style.display = "initial";
-    }
-  </script>
-   
 </html>
+
