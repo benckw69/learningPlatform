@@ -9,19 +9,19 @@ const bcrypt = require('bcrypt');
 
 router.get('/',(req,res)=>{
 
-  let error, type, loginText;
+  let msgCode, msg, type, loginText;
   if(req.query.type) type=req.query.type;
   if(req.query.type=="student") loginText="學生註冊";
   else if(req.query.type=="teacher") loginText="老師註冊";
-  if(req.query.error) error=req.query.error;
+  if(req.query.msg) msgCode=req.query.msg;
   
   if(req.session.user) res.redirect("/");
-  else if(error=="1") res.render('register',{user:req.session.user, loginText, type:type, title:config.title, msg:"註冊失敗：兩個輸入密碼並不一致"});
-  else if(error=="2") res.render('register',{user:req.session.user, loginText, type:type, title:config.title, msg:"註冊失敗：密碼長度未夠8位"});
-  else if(error=="3") res.render('register',{user:req.session.user, loginText, type:type, title:config.title, msg:"註冊失敗：電郵地址已經存在"});
-  else if(error=="4") res.render('register',{user:req.session.user, loginText, type:type, title:config.title, msg:"註冊失敗：未能新増紀錄，請再嘗試"});
-  else if(error=="5") res.render('register',{user:req.session.user, loginText, type:type, title:config.title, msg:"註冊失敗：未能尋找新増紀錄，請再嘗試"});
-  else if(error=="6") res.render('register',{user:req.session.user, loginText, type:type, title:config.title, msg:"註冊失敗：電郵地址格式錯誤"});
+  else if(msg=="1") res.render('register',{user:req.session.user, loginText: loginText, type:type, title:config.title, msg:"註冊失敗：兩個輸入密碼並不一致"});
+  else if(msg=="2") res.render('register',{user:req.session.user, loginText: loginText, type:type, title:config.title, msg:"註冊失敗：密碼長度未夠8位"});
+  else if(msg=="3") res.render('register',{user:req.session.user, loginText: loginText, type:type, title:config.title, msg:"註冊失敗：電郵地址已經存在"});
+  else if(msg=="4") res.render('register',{user:req.session.user, loginText: loginText, type:type, title:config.title, msg:"註冊失敗：未能新増紀錄，請再嘗試"});
+  else if(msg=="5") res.render('register',{user:req.session.user, loginText: loginText, type:type, title:config.title, msg:"註冊失敗：未能尋找新増紀錄，請再嘗試"});
+  else if(msg=="6") res.render('register',{user:req.session.user, loginText: loginText, type:type, title:config.title, msg:"註冊失敗：電郵地址格式錯誤"});
   else if(type == "student" || type == "teacher") res.render('register',{user:req.session.user, loginText, type:type, title:config.title , msg:""});
   else res.redirect('/');
 

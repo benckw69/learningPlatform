@@ -30,7 +30,6 @@ router.get('/', async (req, res) => {
   }
   else res.redirect('/');
 }).get('/edit/personalInfo', async (req, res) => {
-  console.log(req.query.error);
   let msgCode = req.query.msg, msg;
   if(msgCode=="1") msg= "更改資料成功";
   else if(msgCode=="2") msg = "更改資料失敗：密碼錯誤";
@@ -68,7 +67,7 @@ router.get('/', async (req, res) => {
   let msgCode = req.query.msg, msg;
   if(msgCode=="1") msg= "更改密碼成功";
   else if(msgCode=="2") msg = "更改密碼失敗：密碼錯誤";
-  console.log(msg)
+  
   if(req.session.user) {
     res.render('users_edit_password',{user:req.session.user, title:config.title, msg:msg});
   }
@@ -87,7 +86,7 @@ router.get('/', async (req, res) => {
   else res.redirect('/users/edit/password?msg=2');
 
 }).get('/delete',(req,res)=>{
-  if(req.session.user) {
+  if(req.session.user && req.session.user.type=="student" && req.session.user.type=="teacher") {
 
     //delete user data and user paid course data.  Only allow teacher and student type to delete the account.  Need edit.
     let successfullyDelete = true;

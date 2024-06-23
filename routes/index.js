@@ -8,7 +8,7 @@ const ObjectId = require('mongodb').ObjectId;
 const menuId = new ObjectId("6674d5e69626bba98ce76506");
 
 /* GET home page. */
-router.get('/', async (req, res)=> {
+router.get('/', (req, res)=> {
   res.render('index',{user:req.session.user, title:config.title});
 
 }).get('/logout', (req, res) => {

@@ -9,7 +9,7 @@ const ObjectId = require('mongodb').ObjectId;
 /* GET courses page. */
 //show all courses, pass course object to ejs. Can see the comments
 router.get('/',async (req,res)=>{
-    if(req.session.user){
+    if(req.session.user&& req.session.user.type=="student"){
         //get data from database
         let courses;
         try {
@@ -25,7 +25,7 @@ router.get('/',async (req,res)=>{
     
 }).get('/paid',async (req,res)=>{
     //only students can see the page.  Show the course student attended, pass only the course student attended
-    if(req.session.user){
+    if(req.session.user&& req.session.user.type=="student"){
 
         let courses=[];
         try{
@@ -50,7 +50,7 @@ router.get('/',async (req,res)=>{
     else res.redirect('/');
 }).get('/myCourses',(req,res)=>{
     //only teachers can see the page. Need edit.
-    if(req.session.user){
+    if(req.session.user&& req.session.user.type=="teacher"){
 
         //first, get course paid, then get course detail
         let courses = [{ 
@@ -81,7 +81,7 @@ router.get('/',async (req,res)=>{
     }
     else res.redirect('/');
 }).get('/myCourses/:courseId',(req,res)=>{
-    if(req.session.user){
+    if(req.session.user&& req.session.user.type=="teacher"){
         //only course owner can see the page.  Course owner can edit the data, show the form that allow course owner to edit.  Need edit
         let course, canView=true;
         if(req.params.courseId=="1"){
@@ -114,7 +114,7 @@ router.get('/',async (req,res)=>{
     }
     else res.redirect('/');
 }).post('/myCourses/:courseId',(req,res)=>{
-    if(req.session.user){
+    if(req.session.user&& req.session.user.type=="teacher"){
         //allow the course to be edit by course owner, handle edited content to database
         let edited = true;
         if(login && type=="teacher" && id && edited) res.redirect('/courses/myCourses/'+req.params.courseId+'?error=false');
@@ -123,7 +123,7 @@ router.get('/',async (req,res)=>{
     else res.redirect('/');
 
 }).get('/:courseId', async (req, res)=>{
-    if(req.session.user){
+    if(req.session.user&& req.session.user.type=="student"){
         //get single course detail by course id
         try {
             await client.connect();
@@ -151,7 +151,7 @@ router.get('/',async (req,res)=>{
     }
     else res.redirect('/');
 }).get('/:courseId/buy', (req, res)=>{
-    if(req.session.user){
+    if(req.session.user&& req.session.user.type=="student"){
     
     //insert buy record at database.  Need edit
     

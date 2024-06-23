@@ -11,13 +11,11 @@ router.get('/insert', (req, res) => {
   if(msgCode=="1") msg= "成功兌換現金卷";
   else if(msgCode=="2") msg = "兌換現金卷失敗，請再嘗試";
 
-  if(req.session.user){
-    if(req.session.user.type=="student") res.render('moneyTickets_insert', { user:req.session.user, title:config.title, msg:msg });
-    else res.redirect('/');
-  } else res.redirect('/');
+  if(req.session.user&& req.session.user.type=="student") res.render('moneyTickets_insert', { user:req.session.user, title:config.title, msg:msg });
+  else res.redirect('/');
 
 }).post('/insert', (req, res) => {
-  if(req.session.user) {
+  if(req.session.user && req.session.user.type=="student") {
     //need edit
     let added = true;
     if(added) res.redirect('/moneyTickets/insert?msg=1');
@@ -30,13 +28,13 @@ router.get('/insert', (req, res) => {
   }
   else res.redirect('/');
 }).get('/view',(req,res)=>{
-  if(req.session.user) res.render('moneyTickets_view', { user:req.session.user, moneyTickets:[{code:"abc123", money:12}], title:config.title });
+  if(req.session.user && req.session.user.type=="admin") res.render('moneyTickets_view', { user:req.session.user, moneyTickets:[{code:"abc123", money:12}], title:config.title });
   else res.redirect('/');
 }).get('/new',(req,res)=>{
-  if(req.session.user) res.render('moneyTickets_new', { user:req.session.user, title:config.title, msg:"" });
+  if(req.session.user && req.session.user.type=="admin") res.render('moneyTickets_new', { user:req.session.user, title:config.title, msg:"" });
   else res.redirect('/');
 }).post('/new',(req,res)=>{
-  if(req.session.user) {
+  if(req.session.user && req.session.user.type=="admin") {
     //need edit
     if(req.session.user) {
       let insert = true;
