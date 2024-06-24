@@ -116,7 +116,7 @@ router.get('/', async (req, res) => {
 }).post('/edit/password',async (req,res)=>{
   if(req.session.user) {
     if(req.body.password_new != req.body.password_new2) res.redirect('/users/edit/password?msg=3');
-    else if(req.body.password_o < 8)  res.redirect('/users/edit/password?msg=4');
+    else if(req.body.password_new < 8)  res.redirect('/users/edit/password?msg=4');
     else if(!bcrypt.compareSync(req.body.password_o, req.session.user.password)) res.redirect('/users/edit/password?msg=2');
     else {
       const saltRounds = 10;
