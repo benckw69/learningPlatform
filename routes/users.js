@@ -69,7 +69,7 @@ router.get('/', async (req, res) => {
       user_new.introduction = req.body.introduction;
     }
     if (!validator.validate(user_new.email)) res.redirect('/users/edit/personalInfo?msg=5');
-    else if (user_new.length == 0) res.redirect('/users/edit/personalInfo?msg=6');
+    else if (user_new.username.length == 0) res.redirect('/users/edit/personalInfo?msg=6');
     else if (req.session.user.type=="teacher" && user_new.introduction.length == 0) res.redirect('/users/edit/personalInfo?msg=7');
     else if(!bcrypt.compareSync(req.body.password, req.session.user.password)) res.redirect('/users/edit/personalInfo?msg=2');
     else {
