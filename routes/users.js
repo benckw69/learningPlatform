@@ -85,13 +85,25 @@ router.get('/', async (req, res) => {
   }
   else res.redirect('/users/edit/password?msg=2');
 
-}).get('/delete',(req,res)=>{
-  if(req.session.user && req.session.user.type=="student" && req.session.user.type=="teacher") {
+}).get('/delete',async (req,res)=>{
+  if(req.session.user && req.session.user.type=="student" || req.session.user.type=="teacher") {
 
     //delete user data and user paid course data.  Only allow teacher and student type to delete the account.  Need edit.
-    let successfullyDelete = true;
-
-    if(successfullyDelete) res.redirect('/?delete=true');
+    let user = req.session.user;
+    try {
+      await client.connect();
+      const users_c = client.db("learningPlatform").collection("users");  
+      let user_d = await users_c.deleteOne({_id:new ObjectId(user._id)});
+      if(user_d){
+        const buyRecords = client.db("learningPlatform").collection("buyRecords");
+        let user_d2 = await buyRecords.deleteMany({userId:new ObjectId(user._id)});
+        delete req.session.user;
+        res.redirect('/?msg=1');
+      }
+      else res.redirect('/?msg=2');
+    } finally {
+        await client.close();
+    }
   }
   else res.redirect('/');
 

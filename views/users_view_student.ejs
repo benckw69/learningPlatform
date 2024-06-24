@@ -24,9 +24,15 @@
 
         <button type="button" class="registerbtn" id="editButton" onclick="window.location.href='/users/edit/personalInfo'">編輯個人資料</button>
         <button type="button" class="registerbtn" onclick="window.location.href='/users/edit/password'">更改密碼</button>
-        <button type="button" class="registerbtn" style="background-color: red;" id="delete" onclick="window.location.href='/users/delete'">刪除帳戶</button>
-      </div>
-    
+        <button type="button" class="registerbtn" style="background-color: red;" id="delete" onclick="deleteUser()">刪除帳戶</button>
+      </div>  
     </form>
+    <script>
+      function deleteUser(){
+        if(confirm("你確定要刪除帳戶嗎？")){
+          window.location.replace('/users/delete');
+        }
+      }
+    </script>
   </body>
 </html>

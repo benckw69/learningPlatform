@@ -9,7 +9,11 @@ const menuId = new ObjectId("6674d5e69626bba98ce76506");
 
 /* GET home page. */
 router.get('/', (req, res)=> {
-  res.render('index',{user:req.session.user, title:config.title});
+  let pop;
+  if(req.query.msg == "1") pop = "帳戶已經刪除";
+  else if(req.query.msg == "2") pop = "個人資料不存在";
+  else if(req.query.msg == "3") pop = "新帳戶成功創立";
+  res.render('index',{user:req.session.user, title:config.title, pop:pop});
 
 }).get('/logout', (req, res) => {
   //handle logout and redirect to '/'.

@@ -57,7 +57,7 @@ router.get('/',(req,res)=>{
           const newUser = await users_c.findOne({email:email, type:type});
           if(newUser) {
             req.session.user = newUser;
-            res.redirect('/');
+            res.redirect('/?msg=3');
           }
           else res.redirect('/register?type='+type+'&error=5');
         }
