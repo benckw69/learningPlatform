@@ -15,17 +15,17 @@
         <hr>
     
         <label for="email"><b>電郵地址</b></label>
-        <input type="text" name="email" value="<%= personalInfo.email %>" required>
+        <input type="text" name="email" value="<%= user.email %>" required>
     
         <label for="username"><b>用戶名稱</b></label>
-        <input type="text" name="username" value="<%= personalInfo.username %>" required>
+        <input type="text" name="username" value="<%= user.username %>" required>
 
         <label for="username"><b>密碼</b></label>
         <input type="password" name="password" required>
 
         <button type="submit" class="registerbtn" >更改資料</button>
         
-        <button type="button" class="registerbtn" style="background-color:blue" onclick="window.location.href='/users?type=<%= type %>&login=<%= login %>&id=<%= id %>'">回到上一頁</button>
+        <button type="button" class="registerbtn" style="background-color:blue" onclick="window.location.href='/users'">回到上一頁</button>
       </div>
       <label for="uname" ><b><%= msg %></b></label>
     </form>
