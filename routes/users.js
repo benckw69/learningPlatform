@@ -102,24 +102,48 @@ router.get('/', async (req, res) => {
 }).get('/edit/password',(req,res)=>{
   let msgCode = req.query.msg, msg;
   if(msgCode=="1") msg= "更改密碼成功";
-  else if(msgCode=="2") msg = "更改密碼失敗：密碼錯誤";
+  else if(msgCode=="2") msg = "原始密碼錯誤，請重新輸入";
+  else if(msgCode=="3") msg = "兩個輸入密碼並不一致，請重新輸入";
+  else if(msgCode=="4") msg = "密碼長度未夠8位，請重新輸入";
+  else if(msgCode=="5") msg = "更改資料失敗，請稍後再試";
+  else if(msgCode=="6") msg = "出現未知錯誤，請登出以確保沒有問題";
   
   if(req.session.user) {
     res.render('users_edit_password',{user:req.session.user, title:config.title, msg:msg});
   }
   else res.redirect('/');
 
-}).post('/edit/password',(req,res)=>{
+}).post('/edit/password',async (req,res)=>{
   if(req.session.user) {
-  
-    //update the password from database. Check whether two new passwords are the same.  Need edit.
-    let updated = true;
-    if(req.body.password_new != req.body.password_new2) updated = false;
-
-
-    if(updated) res.redirect('/users/edit/password?msg=1');
+    if(req.body.password_new != req.body.password_new2) res.redirect('/users/edit/password?msg=3');
+    else if(req.body.password_o < 8)  res.redirect('/users/edit/password?msg=4');
+    else if(!bcrypt.compareSync(req.body.password_o, req.session.user.password)) res.redirect('/users/edit/password?msg=2');
+    else {
+      const saltRounds = 10;
+      const salt = bcrypt.genSaltSync(saltRounds);
+      const hash = bcrypt.hashSync(req.body.password_new, salt);
+      let user_new = structuredClone(req.session.user);
+      user_new.password = hash;
+      delete user_new._id;
+      try{
+        await client.connect();
+        const users_c = client.db("learningPlatform").collection("users");
+        const result = await users_c.replaceOne({_id:new ObjectId(req.session.user._id)},user_new);
+        if(result.acknowledged) {
+          const result2 = await users_c.findOne({_id:new ObjectId(req.session.user._id)});
+          if(result2){
+            req.session.user = result2;
+            res.redirect('/users/edit/password?msg=1');
+          }
+          else res.redirect('/users/edit/password?msg=6');
+        }
+        else res.redirect('/users/edit/password?msg=5');
+      } finally {
+        await client.close();
+      }
+    }
   }
-  else res.redirect('/users/edit/password?msg=2');
+  else res.redirect('/');
 
 }).get('/delete',async (req,res)=>{
   if(req.session.user && req.session.user.type=="student" || req.session.user.type=="teacher") {
@@ -142,8 +166,6 @@ router.get('/', async (req, res) => {
     }
   }
   else res.redirect('/');
-
 });
-
 
 module.exports = router;
