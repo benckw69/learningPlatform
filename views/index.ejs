@@ -8,15 +8,13 @@
     <h1><%= title %></h1>
 
     <%- include('header',{user:user}) %>
-    <br/><br/><h2 style="display:none" id="deleteText">你的帳戶已被刪除</h2>
     
   </body>
 
   <script>
     const searchParams = new URLSearchParams(window.location.search);
-
-    if(searchParams.get('delete')=="true"){
-      document.getElementById('deleteText').style.display = "initial";
+    if(searchParams.get('msg')){
+      alert('<%= pop %>');
     }
   </script>
    
