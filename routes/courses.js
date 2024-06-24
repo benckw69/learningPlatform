@@ -81,9 +81,13 @@ router.get('/',async (req,res)=>{
     }
     else res.redirect('/');
 }).get('/myCourses/:courseId',(req,res)=>{
+    let msg;
+    if(req.query.msg=="1") msg="更改資料成功";
+    else if(req.query.msg=="2") msg="更改資料失敗。請重新嘗試";
     if(req.session.user&& req.session.user.type=="teacher"){
         //only course owner can see the page.  Course owner can edit the data, show the form that allow course owner to edit.  Need edit
         let course, canView=true;
+        
         if(req.params.courseId=="1"){
             course = { 
                 name: 'Java',
@@ -110,15 +114,15 @@ router.get('/',async (req,res)=>{
                 category:"music"
             }
         }
-        res.render('courses_myCourses_edit',{user:req.session.user, course:course, courseId:req.params.courseId, title:config.title});
+        res.render('courses_myCourses_edit',{user:req.session.user, course:course, courseId:req.params.courseId, title:config.title, msg:msg});
     }
     else res.redirect('/');
 }).post('/myCourses/:courseId',(req,res)=>{
     if(req.session.user&& req.session.user.type=="teacher"){
         //allow the course to be edit by course owner, handle edited content to database
         let edited = true;
-        if(login && type=="teacher" && id && edited) res.redirect('/courses/myCourses/'+req.params.courseId+'?error=false');
-        else if (login && type=="teacher" && id && !edited) res.redirect('/courses/myCourses/'+req.params.courseId+'?error=true');
+        if(login && type=="teacher" && id && edited) res.redirect('/courses/myCourses/'+req.params.courseId+'?msg=1');
+        else if (login && type=="teacher" && id && !edited) res.redirect('/courses/myCourses/'+req.params.courseId+'?msg=2');
     }
     else res.redirect('/');
 
