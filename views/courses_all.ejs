@@ -8,6 +8,37 @@
     <h1><%= title %></h1>
     <%- include('header',{user:user}) %>
 
+    <form action="/courses" method="post" onchange="changeSearch()">
+      <select id="searchMethod" name="searchMethod">
+      <option value="words">關鍵字</option>
+      <option value="groups">類別</option>
+    </select>
+    <span id="words" style="display: none;">
+      <input type="text" id="fname" name="searchWord">
+    </span>
+    <span id="groups" style="display: none;">
+      <select name="groups1">
+        <option value="programming">程式</option>
+        <option value="music">音樂</option>
+      </select>
+    </span>
+      <input type="submit" value="Submit">
+    </form> 
+    
+    <script>
+      function changeSearch(){
+        if(document.getElementById('searchMethod').value=="words"){
+          document.getElementById('words').style.display = 'initial';
+          document.getElementById('groups').style.display = 'none';
+        }
+          else if(document.getElementById('searchMethod').value=="groups"){
+          document.getElementById('groups').style.display = 'initial';
+          document.getElementById('words').style.display = 'none';
+          }
+      }
+      changeSearch();
+    </script>
+
     <ul>
       <% courses.forEach(course=> { %>
           <li><a href="/courses/<%= course._id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
