@@ -48,83 +48,101 @@ router.get('/',async (req,res)=>{
         }
     }
     else res.redirect('/');
-}).get('/myCourses',(req,res)=>{
-    //only teachers can see the page. Need edit.
+}).get('/myCourses',async(req,res)=>{
+    //only teachers can see the page.
     if(req.session.user&& req.session.user.type=="teacher"){
-
-        //first, get course paid, then get course detail
-        let courses = [{ 
-            name: 'Java',
-            introduction:'This is a java course',
-            money:500,
-            content:"This is a java course.  ",
-            whatPeopleLearn:"People can learn java through the course",
-            author:"Alan",
-            id:1,
-            videoLink:"https://www.youtube.com/watch?v=xk4_1vDrzzo",
-            photoLink:"https://www.freecodecamp.org/news/content/images/2023/09/javacrash.png",
-            category:"programming"
-        },{ 
-            name: 'Violin',
-            introduction:'This is a Violin course',
-            money:1000,
-            content:"This is a Violin course.  ",
-            author:"Ben",
-            id:2,
-            videoLink:"https://www.youtube.com/watch?v=iPbCdOsrDK4",
-            photoLink:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Violin_VL100.png",
-            category:"music"
+        let courses_c = client.db("learningPlatform").collection("courses");
+        let courses_u = client.db("learningPlatform").collection("users");
+        let courses=[];
+                //first, get course paid, then get course detail
+        try {
+          await client.connect();
+          //convert author name from _id to username of the author
+          let data = await courses_c.find({author:new ObjectId(req.session.user._id)}).toArray();
+          let courseauthor_a = data.map((data)=>data.author);
+          let courseauthor_b = await courses_u.findOne({_id:new ObjectId(courseauthor_a[0])})
+          let authorname = courseauthor_b.username;
+          for (let i=0;i<data.length;i++) {
+          data[i].author = authorname;
+          }
+            res.render("courses_myCourses", {
+                user: req.session.user,
+                courses: data,title:config.title
+              });
+        } finally {
+          await client.close();
         }
-        ]
-
-        res.render('courses_myCourses',{user:req.session.user, courses:courses, title:config.title});
-    }
-    else res.redirect('/');
-}).get('/myCourses/:courseId',(req,res)=>{
-    let msg;
+      } else res.redirect("/");
+}).get('/myCourses/:courseId',async(req,res)=>{
+    const {courseId} = req.params;
+    //define edit message
+    let msg = req.query.msg;
     if(req.query.msg=="1") msg="更改資料成功";
     else if(req.query.msg=="2") msg="更改資料失敗。請重新嘗試";
     if(req.session.user&& req.session.user.type=="teacher"){
+        let courses_c = client.db("learningPlatform").collection("courses");
+      let courses = [];
         //only course owner can see the page.  Course owner can edit the data, show the form that allow course owner to edit.  Need edit
         let course, canView=true;
-        
-        if(req.params.courseId=="1"){
-            course = { 
-                name: 'Java',
-                introduction:'This is a java course',
-                money:500,
-                content:"This is a java course.  ",
-                whatPeopleLearn:"People can learn java through the course",
-                author:"Alan",
-                id:1,
-                videoLink:"https://www.youtube.com/watch?v=xk4_1vDrzzo",
-                photoLink:"https://www.freecodecamp.org/news/content/images/2023/09/javacrash.png",
-                category:"programming"
+        try {
+          await client.connect();
+          let data = await courses_c.findOne({_id:new ObjectId(req.params.courseId)});
+          if (data) {
+              res.render("courses_myCourses_edit", {
+                user: req.session.user,
+                course: data,
+                courseId:req.params._id, title:config.title,msg:msg
+              });
             }
-        } else {
-            course = { 
-                name: 'Violin',
-                introduction:'This is a Violin course',
-                money:1000,
-                content:"This is a Violin course.  ",
-                author:"Ben",
-                id:2,
-                videoLink:"https://www.youtube.com/watch?v=iPbCdOsrDK4",
-                photoLink:"https://upload.wikimedia.org/wikipedia/commons/1/1b/Violin_VL100.png",
-                category:"music"
-            }
+        } finally {
+          await client.close();
         }
-        res.render('courses_myCourses_edit',{user:req.session.user, course:course, courseId:req.params.courseId, title:config.title, msg:msg});
     }
     else res.redirect('/');
-}).post('/myCourses/:courseId',(req,res)=>{
+}).post('/myCourses/:courseId',async(req,res)=>{
+    const {courseId} = req.params;
     if(req.session.user&& req.session.user.type=="teacher"){
+        console.log("a");
+        let courses_c = client.db("learningPlatform").collection("courses");
+        //rendering details of selected course
         //allow the course to be edit by course owner, handle edited content to database
-        let edited = true;
-        if(login && type=="teacher" && id && edited) res.redirect('/courses/myCourses/'+req.params.courseId+'?msg=1');
-        else if (login && type=="teacher" && id && !edited) res.redirect('/courses/myCourses/'+req.params.courseId+'?msg=2');
-    }
+            try {
+            await client.connect();
+            let data = await courses_c.findOne({name: req.body.name,
+            introduction: req.body.introduction,
+            money: req.body.money,
+            content: req.body.content,
+            whatPeopleLearn: req.body.whatPeopleLearn,
+            videoLink: req.body.videoLink,
+            photoLink: req.body.photoLink,
+            category: req.body.category}
+            );
+ 
+            let data1 = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {
+                $set: {
+            name: req.body.name,
+            introduction: req.body.introduction,
+            money: req.body.money,
+            content: req.body.content,
+            whatPeopleLearn: req.body.whatPeopleLearn,
+            videoLink: req.body.videoLink,
+            photoLink: req.body.photoLink,
+            category: req.body.category
+                }
+          });
+        if(req.session.user && req.session.user.type=="teacher") {
+            msg = "1";
+            res.redirect(`/courses/myCourses/${req.params.courseId}?error=false`);
+        }
+        else /*if (!req.session.user && req.session.user.type!="teacher")*/ { 
+            msg = "2";
+            res.redirect(`/courses/myCourses/${req.params.courseId}?error=true`);
+        }
+    } finally {
+    await client.close();
+  }}
     else res.redirect('/');
+    
 
 }).get('/:courseId', async (req, res)=>{
     if(req.session.user&& req.session.user.type=="student"){
