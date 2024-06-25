@@ -130,13 +130,11 @@ router.get('/',async (req,res)=>{
             category: req.body.category
                 }
           });
-        if(req.session.user && req.session.user.type=="teacher") {
-            msg = "1";
-            res.redirect(`/courses/myCourses/${req.params.courseId}?error=false`);
+        if (data1.matchedCount == 1) {
+            res.redirect(`/courses/myCourses/${req.params.courseId}?msg=1`);
         }
-        else /*if (!req.session.user && req.session.user.type!="teacher")*/ { 
-            msg = "2";
-            res.redirect(`/courses/myCourses/${req.params.courseId}?error=true`);
+        else { 
+            res.redirect(`/courses/myCourses/${req.params.courseId}?msg=2`);
         }
     } finally {
     await client.close();
