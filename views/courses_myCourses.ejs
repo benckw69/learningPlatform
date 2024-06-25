@@ -10,7 +10,7 @@
 
     <ul>
       <% courses.forEach(course=> { %>
-          <li><a href="/courses/myCourses/<%= course.id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
+          <li><a href="/courses/myCourses/<%= course._id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
           </li>
           <% }); %>
     </ul>

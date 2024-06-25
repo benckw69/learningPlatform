@@ -9,7 +9,7 @@
         <h1><%= title %></h1>
         <%- include('header',{user:user}) %>
         
-        <form action="/courses/myCourses/<%= courseId %>" method="post" id="courseform">
+        <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform">
             <div class="container">
                 <h1 id="registerText">課程資料</h1>
                 <hr>
