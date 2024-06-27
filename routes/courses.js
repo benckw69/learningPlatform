@@ -10,6 +10,16 @@ const courses_c = client.db("learningPlatform").collection("courses");
 const courses_u = client.db("learningPlatform").collection("users");
 const buyRecords_c = client.db("learningPlatform").collection("buyRecords");
 
+const isValidUrl = urlString=> {
+    var urlPattern = new RegExp('^(https?:\\/\\/)?'+ // validate protocol
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // validate domain name
+  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // validate OR ip (v4) address
+  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // validate port and path
+  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // validate query string
+  '(\\#[-a-z\\d_]*)?$','i'); // validate fragment locator
+return !!urlPattern.test(urlString);
+}
+
 /* GET courses page. */
 //show all courses, pass course object to ejs. Can see the comments
 router.get('/',async (req,res)=>{
@@ -37,20 +47,23 @@ router.get('/',async (req,res)=>{
         let courses=[];
         try{
             await client.connect();
-            let data = await buyRecords_c.find({userId:new ObjectId(req.session.user._id)}).toArray();
-            console.log(courses)
-            if(data){
-                for (const i of data){
-                    let data1 = await courses_c.findOne({_id:i.courseId});
-                    if(data1) courses.push(data1);
-                }
-                console.log(courses)
-                res.render('courses_paid',{user:req.session.user, courses:courses, title:config.title});
+            let buyRecords = await buyRecords_c.find({userId:new ObjectId(req.session.user._id)}).toArray();
+            console.log("c",buyRecords)
+            if(buyRecords){
+                for (const i of buyRecords){
+                let boughtcourses = await courses_c.findOne({_id:i.courseId});
+                courses.push(boughtcourses);
             }
-            else {
+                console.log(courses)
+                for (let i=0;i<courses.length;i++){
+                let courseauthor = await courses_u.findOne({_id:courses[i].author});
+                courses[i].author = courseauthor.username;
+                }
+                res.render('courses_paid',{user:req.session.user, courses:courses, title:config.title});
+                     } else {
                 res.render('courses_paid',{user:req.session.user, courses:[], message:"你沒有任何購買紀錄！", title:config.title});
             }
-        } finally{
+    } finally{
             await client.close();
         }
     }
@@ -111,7 +124,6 @@ router.get('/',async (req,res)=>{
 }).post('/myCourses/:courseId',async(req,res)=>{
     const {courseId} = req.params;
     if(req.session.user&& req.session.user.type=="teacher"){
-        console.log("a");
         //rendering details of selected course
         //allow the course to be edit by course owner, handle edited content to database
             try {
@@ -150,6 +162,58 @@ router.get('/',async (req,res)=>{
     else res.redirect('/');
     
 
+}).get('/newCourse',(req,res)=>{
+    if(req.session.user&& req.session.user.type=="teacher") {
+        let msg="";
+        if(req.query.msg==1) msg="新増課程成功";
+        else if(req.query.msg==2) msg="新増課程失敗";
+        else if(req.query.msg==3) msg+="課程名稱已被使用\n"
+        else if(req.query.msg==4) msg+="課程價錢必須為數字\n"
+        else if(req.query.msg==5) msg+="圖片連結或影片連結不正確"
+        res.render('courses_newCourse',{
+            user: req.session.user,
+            title:config.title,
+            msg:msg});
+    }
+    else res.redirect('/');
+}).post('/newCourse',async(req,res)=>{
+    if(req.session.user&& req.session.user.type=="teacher"){
+        //add course to database
+            try {
+            await client.connect();
+        //check if course name is already used
+        let data = {name: req.body.name,
+            introduction: req.body.introduction,
+            money: req.body.money,
+            content: req.body.content,
+            whatPeopleLearn: req.body.whatPeopleLearn,
+            author: new ObjectId(req.session.user._id),
+            videoLink: req.body.videoLink,
+            photoLink: req.body.photoLink,
+            category: req.body.category
+        };
+        const existingDocument = await courses_c.findOne({ name: req.body.name });
+        if (existingDocument) {
+           res.redirect(`/courses/newCourse?msg=3`);
+        } else {
+            console.log(data)
+            if (isValidUrl(req.body.videoLink) || isValidUrl(req.body.photoLink)) {
+                res.redirect(`/courses/newCourse?msg=5`);
+            } else if (!Number.isInteger(parseInt(req.body.money))) {
+            console.log("4")
+            res.redirect(`/courses/newCourse?msg=4`);
+        } else if (data.insertedCount === 1) {
+            await courses_c.insertOne(data);
+            res.redirect(`/courses/newCourse?msg=1`);
+        } else { 
+            console.log("2")
+            res.redirect(`/courses/NewCourse?msg=2`);
+        }
+        }
+    } finally {
+    await client.close();
+  }}
+    else res.redirect('/');
 }).get('/:courseId', async (req, res)=>{
     const {courseId} = req.params;
     if(req.session.user&& req.session.user.type=="student"){
@@ -169,24 +233,26 @@ router.get('/',async (req,res)=>{
                     else res.render('courses_detail',{user:req.session.user, course:course, paid:false, title:config.title});
                   }
                  } else res.redirect('/');
-}finally {
+        }finally {
             await client.close();
         }
     }
     else res.redirect('/');
 }).get('/:courseId/buy', async(req, res)=>{
     const {courseId} = req.params;
+    console.log(courseId)
     if(req.session.user&& req.session.user.type=="student"){
     try {
         await client.connect();
-        //insert buy record at database.
+        //insert buy record at database. need edit
         let course = await courses_c.findOne({_id:new ObjectId(courseId)});
         let user = await courses_u.findOne({_id:req.session.user._id});
         if (user.money >= course.money) {
             let canBuy = true;
         if (canBuy) {
-            await buyRecords_c.insertOne({userId:req.session.user._id, courseId:courseId})
-            await courses_u.updateOne({money})
+            let balance = user.money -= course.money;
+            await buyRecords_c.insertOne({userId:req.session.user._id, courseId:courseId});
+            await courses_u.updateOne({_id:req.session.user._id}, {$set: {money: balance}});
         }
     }
             res.render('courses_detail',{user:req.session.user, course:course, title:config.title});
