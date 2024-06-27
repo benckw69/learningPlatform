@@ -58,13 +58,12 @@ router.get('/',async (req,res)=>{
         try {
           await client.connect();
           //convert author name from _id to username of the author
-          let data = await courses_c.findOne({author:new ObjectId(req.session.user._id)});
+          let data = await courses_c.find({author:new ObjectId(req.session.user._id)}).toArray();
           //let courseauthor_a = data.map((data)=>data.author);
-          if(data){
-            let courseauthor_a = data.author;
-            let courseauthor_b = await courses_u.findOne({_id:courseauthor_a})
-            if(courseauthor_b){
-                let authorname = courseauthor_b.username;
+          if(data.length>=1){
+            let courseauthor = await courses_u.findOne({_id:data[0].author})
+            if(courseauthor){
+                let authorname = courseauthor.username;
                 for (let i=0;i<data.length;i++) {
                 data[i].author = authorname;
                 }
