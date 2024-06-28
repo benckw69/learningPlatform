@@ -34,13 +34,60 @@ router.get('/',async (req,res)=>{
             let courseauthor_b = await courses_u.findOne({_id:new ObjectId(courseauthor_a[i])})
             courses[i].author = courseauthor_b.username;
             }
-            if(courses) res.render('courses_all',{user:req.session.user, courses:courses, title:config.title});
+            if(courses) res.render('courses_all',{user:req.session.user, courses:courses, title:config.title, search:{method:"words",param:""}});
         } finally {
             await client.close();
         }
     }
     else res.redirect('/');
     
+}).post('/',async (req,res)=>{
+    if(req.session.user && req.session.user.type=="student"){
+        let courses_c = client.db('learningPlatform').collection('courses');
+        let users_c = client.db('learningPlatform').collection('users');
+        let {searchMethod} = req.body;
+        try {
+            await client.connect();
+            if(searchMethod == "words"){
+                let {searchWords} = req.body;
+                let searchByWords = await courses_c.find({name:{$regex:searchWords}}).toArray();
+                for(let i=0; i<searchByWords.length;i++){
+                    searchByWords[i].id = searchByWords[i].author;
+                    let findAuthorName = await users_c.findOne({_id:searchByWords[i].id});
+                    searchByWords[i].author = findAuthorName.username;
+                }
+                res.render('courses_all',{user:req.session.user, courses:searchByWords, title:config.title, search:{method:"words",param:searchWords}});
+            } else if(searchMethod == "category"){
+                let {category} = req.body;
+                let searchByCategory;
+                if(category=="all") searchByCategory = await courses_c.find().toArray();
+                else searchByCategory = await courses_c.find({category:category}).toArray();
+                for(let i=0; i<searchByCategory.length;i++){
+                    searchByCategory[i].id = searchByCategory[i].author;
+                    let findAuthorName = await users_c.findOne({_id:searchByCategory[i].id});
+                    searchByCategory[i].author = findAuthorName.username;
+                }
+                res.render('courses_all',{user:req.session.user, courses:searchByCategory, title:config.title, search:{method:"category",param:category}});
+            } else if(searchMethod == "tutor"){
+                let {searchWords} = req.body;
+                let searchTutor = await users_c.find({username:{$regex:searchWords}, type:"teacher"}).toArray();
+                let authorName = [];
+                for(const i of searchTutor) {
+                    authorName.push(i._id);
+                }
+                let searchByAuthorId = await courses_c.find({author:{$in:authorName}}).toArray();
+                for(let i=0;i<searchByAuthorId.length;i++){
+                    searchByAuthorId[i].id = searchByAuthorId[i].author;
+                    let findAuthorName = await users_c.findOne({_id:searchByAuthorId[i].id});
+                    searchByAuthorId[i].author = findAuthorName.username;
+                }
+                res.render('courses_all',{user:req.session.user, courses:searchByAuthorId, title:config.title, search:{method:"words",param:searchWords}});
+            } 
+            else res.redirect('/courses');
+        } finally {
+            await client.close();
+        }
+    } else res.redirect('/');
 }).get('/paid',async (req,res)=>{
     //only students can see the page.  Show the course student attended, pass only the course student attended
     if(req.session.user&& req.session.user.type=="student"){

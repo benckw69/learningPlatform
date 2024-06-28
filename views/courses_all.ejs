@@ -3,53 +3,73 @@
   <head>
     <title><%= title %> - 查看課程</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/showCourses.css' />
   </head>
+  <style>
+    .course li a {
+      font-size: 20px;
+    }
+  </style>
   <body>
     <h1><%= title %></h1>
     <%- include('header',{user:user}) %>
-
-    <form action="/courses" method="post" onchange="changeSearch()">
-      <select id="searchMethod" name="searchMethod">
-      <option value="words">關鍵字</option>
-      <option value="groups">類別</option>
-    </select>
-    <span id="words" style="display: none;">
-      <input type="text" id="fname" name="searchWord">
-    </span>
-    <span id="groups" style="display: none;">
-      <select name="groups1">
-        <option value="all">所有領域</option>
-        <option value="programming">程式</option>
-        <option value="music">音樂</option>
-        <option value="investment">投資</option>
-        <option value="language">語言</option>
-        <option value="art">藝術</option>
-        <option value="design">設計</option>
-        <option value="marketing">市場營銷</option>
-      </select>
-    </span>
-      <input type="submit" value="Submit">
-    </form> 
+    <div id="form">
+      <form action="/courses" method="post" onchange="changeSearch()">
+        <select id="searchMethod" name="searchMethod">
+          <option value="words">關鍵字</option>
+          <option value="category">類別</option>
+          <option value="tutor">導師</option>
+        </select>
+        <input type="text" id="searchWords" name="searchWords" style="display: none;">
+        <select name="category" id="category" style="display: none;">
+          <option value="all">所有領域</option>
+          <option value="programming">程式</option>
+          <option value="music">音樂</option>
+          <option value="investment">投資</option>
+          <option value="language">語言</option>
+          <option value="art">藝術</option>
+          <option value="design">設計</option>
+          <option value="marketing">市場營銷</option>
+        </select>
+        <input type="submit" value="提交" id="submit">
+      </form> 
+    </div>
+    <ul id="courses"><% courses.forEach(course=> { %>
+      <li><ul class="course">
+        <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
+        <li>作者： <%= course.author %></li>
+        <li>簡介： <%= course.introduction %></li>
+        <li>價錢： <%= course.money %> </li>
+      </ul></li>
+      <% }); %></ul>
     
+
+  <% 
+      function category_chinese(name){
+        if(name=="programming") return "程式";
+        else if(name=="music") return "音樂";
+        else if(name=="investment") return "投資";
+        else if(name=="language") return "語言";
+        else if(name=="art") return "藝術";
+        else if(name=="design") return "設計";
+        else if(name=="marketing") return "市場營銷";
+        return "錯誤";
+      }
+    %>
     <script>
       function changeSearch(){
-        if(document.getElementById('searchMethod').value=="words"){
-          document.getElementById('words').style.display = 'initial';
-          document.getElementById('groups').style.display = 'none';
+        if(document.getElementById('searchMethod').value=="words" || document.getElementById('searchMethod').value=="tutor"){
+          document.getElementById('searchWords').style.display = 'initial';
+          document.getElementById('category').style.display = 'none';
         }
-          else if(document.getElementById('searchMethod').value=="groups"){
-          document.getElementById('groups').style.display = 'initial';
-          document.getElementById('words').style.display = 'none';
-          }
+        else if(document.getElementById('searchMethod').value=="category"){
+        document.getElementById('category').style.display = 'initial';
+        document.getElementById('searchWords').style.display = 'none';
+        }
       }
+      document.getElementById('searchMethod').value = '<%= search.method %>';
+      if('<%= search.method %>' == 'category') document.getElementById('category').value = '<%= search.param %>';
       changeSearch();
     </script>
-
-    <ul>
-      <% courses.forEach(course=> { %>
-          <li><a href="/courses/<%= course._id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
-          </li>
-          <% }); %>
-    </ul>
   </body>
 </html>
