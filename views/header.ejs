@@ -1,4 +1,40 @@
-<% if(user!==undefined) { if (user.type=="student") { %> 你好，<%= user.username %>。 <a href="/">主頁</a> <a href="/game">小遊戲</a> <a href="/courses">瀏覽所有課程</a> <a href="/courses/paid">瀏覽已付費課程</a> <a href="/users">個人資料</a> <a href="/moneyTickets/insert">輸入現金卷</a> <a href="/logout">登出</a><% } %>
-<% if (user.type=="teacher") { %> 你好，<%= user.username %>。 <a href="/">主頁</a> <a href="/courses/newCourse">新増課程</a> <a href="/courses/myCourses">管理課程</a> <a href="/users">個人資料</a> <a href="/logout">登出</a> <% } %>
-<% if (user.type=="admin") { %> 你好，<%= user.username %>。 <a href="/">主頁</a> <a href="/moneyTickets/view">查看現金卷</a> <a href="/moneyTickets/new">添加現金卷</a> <a href="/users">個人資料</a> <a href="/logout">登出</a> <% } } %>
-<% if (user === undefined) { %> <a href="/">主頁</a> <a href="/login?type=student">學生登入</a> <a href="/login?type=teacher">老師登入</a>  <a href="/register?type=student">學生註冊</a> <a href="/register?type=teacher">老師註冊</a> <% } %>
+<% if(user!==undefined) { if (user.type=="student") { %> 
+    <ul class="menubar">
+        <li class="menuitem"><span>你好，<%= user.username %>。</span> </li>
+        <li class="menuitem"><a href="/">主頁</a> </li>
+        <li class="menuitem"><a href="/game">小遊戲</a> </li>
+        <li class="menuitem"><a href="/courses">瀏覽所有課程</a> </li>
+        <li class="menuitem"><a href="/courses/myCourse">瀏覽已付費課程</a> </li>
+        <li class="menuitem"><a href="/users">個人資料</a> </li>
+        <li class="menuitem"><a href="/moneyTickets/insert">輸入現金卷</a> </li>
+        <li class="menuitem" style="float:right"><a href="/logout">登出</a></li>
+    </ul><% } %>
+
+<% if (user.type=="teacher") { %> 
+    <ul class="menubar">
+        <li class="menuitem">你好，<%= user.username %>。 </li>
+        <li class="menuitem"><a href="/">主頁</a> </li>
+        <li class="menuitem"><a href="/courses/newCourse">新増課程</a> </li>
+        <li class="menuitem"><a href="/courses/myCourses">管理課程</a> </li>
+        <li class="menuitem"><a href="/users">個人資料</a> </li>
+        <li class="menuitem" style="float:right"><a href="/logout">登出</a> </li>
+    </ul><% } %>
+
+<% if (user.type=="admin") { %> 
+    <ul class="menubar">
+        <li class="menuitem">你好，<%= user.username %>。 </li>
+        <li class="menuitem"><a href="/">主頁</a> </li>
+        <li class="menuitem"><a href="/moneyTickets/view">查看現金卷</a> </li>
+        <li class="menuitem"><a href="/moneyTickets/new">輸入現金卷</a> </li>
+        <li class="menuitem"><a href="/users">個人資料</a> </li>
+        <li class="menuitem" style="float:right"><a href="/logout">登出</a> </li>
+    </ul><% } } %>
+
+<% if (user === undefined) { %> 
+    <ul class="menubar">
+        <li class="menuitem"><a href="/">主頁</a></li>
+        <li class="menuitem"><a href="/login?type=student">學生登入</a></li>
+        <li class="menuitem"><a href="/login?type=teacher">老師登入</a></li>
+        <li class="menuitem"><a href="/register?type=student">學生註冊</a></li>
+        <li class="menuitem"><a href="/register?type=teacher">老師註冊</a></li>
+    </ul><% } %>

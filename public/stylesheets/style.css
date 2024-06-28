@@ -1,8 +1,63 @@
 body {
-  padding: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
 }
+
+#myVideo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  opacity: 0.6
+}
+
+/* Add some content at the bottom of the video/page */
+.content {
+  /* position: absolute; */
+  background: #98FB98;
+  color: #f1f1f1;
+  /* width: 85%; */
+  padding: 20px;
+  opacity:0.6;
+  text-shadow: 1px 1px 1px black;
+}
+
+.menubar {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+.menuitem {
+  float: left;
+}
+
+.menuitem a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+.menuitem span {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+
+.menuitem a:hover:not(.active) {
+  background-color: #111;
+}
+
+
