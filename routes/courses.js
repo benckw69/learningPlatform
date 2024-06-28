@@ -24,15 +24,34 @@ return !!urlPattern.test(urlString);
 //show all courses, pass course object to ejs. Can see the comments
 router.get('/',async (req,res)=>{
     if(req.session.user&& req.session.user.type=="student"){
-        //get data from database
-        let courses;
+        //get all courses and ratings from database
         try {
             await client.connect();
             let courses = await courses_c.find().toArray();
+            let buyRecords = await buyRecords_c.find().toArray();
+        //convert author names from _id to their username
             let courseauthor_a = courses.map((courses)=>courses.author);
+            let coursematch_a = courses.map((courses)=>courses._id);
+            console.log("b",coursematch_a)
             for (let i=0;i<courses.length;i++) {
-            let courseauthor_b = await courses_u.findOne({_id:new ObjectId(courseauthor_a[i])})
+            let courseauthor_b = await courses_u.findOne({_id:new ObjectId(courseauthor_a[i])});
+
             courses[i].author = courseauthor_b.username;
+            }
+
+            //
+            let coursematch = [];
+            for (let i=0;i<coursematch_a.length;i++) {
+                coursematch.push([]);
+                let coursematch_b = await buyRecords_c.find({courseId:new ObjectId(coursematch_a[i])}).toArray();
+                for(let j=0;j<coursematch_b.length;j++){
+                    if(coursematch_b[j].rate) coursematch[i].push(coursematch_b[j].rate);
+                    console.log("c",coursematch_b)
+                    console.log("a",coursematch)
+                }
+
+                
+           // console.log("a",courses)
             }
             if(courses) res.render('courses_all',{user:req.session.user, courses:courses, title:config.title});
         } finally {
@@ -48,13 +67,11 @@ router.get('/',async (req,res)=>{
         try{
             await client.connect();
             let buyRecords = await buyRecords_c.find({userId:new ObjectId(req.session.user._id)}).toArray();
-            console.log("c",buyRecords)
             if(buyRecords){
                 for (const i of buyRecords){
                 let boughtcourses = await courses_c.findOne({_id:i.courseId});
                 courses.push(boughtcourses);
             }
-                console.log(courses)
                 for (let i=0;i<courses.length;i++){
                 let courseauthor = await courses_u.findOne({_id:courses[i].author});
                 courses[i].author = courseauthor.username;
@@ -76,6 +93,7 @@ router.get('/',async (req,res)=>{
           await client.connect();
           //convert author name from _id to username of the author
           let data = await courses_c.find({author:new ObjectId(req.session.user._id)}).toArray();
+          let buyRecords = await buyRecords_c.find().toArray();
           if(data.length>=1){
             let courseauthor = await courses_u.findOne({_id:data[0].author})
             if(courseauthor){
@@ -169,7 +187,7 @@ router.get('/',async (req,res)=>{
         else if(req.query.msg==2) msg="新増課程失敗";
         else if(req.query.msg==3) msg+="課程名稱已被使用\n"
         else if(req.query.msg==4) msg+="課程價錢必須為數字\n"
-        else if(req.query.msg==5) msg+="圖片連結或影片連結不正確"
+        else if(req.query.msg==5) msg+="圖片連結或影片連結不是正確的連結"
         res.render('courses_newCourse',{
             user: req.session.user,
             title:config.title,
@@ -196,19 +214,15 @@ router.get('/',async (req,res)=>{
         if (existingDocument) {
            res.redirect(`/courses/newCourse?msg=3`);
         } else {
-            console.log(data)
-            if (isValidUrl(req.body.videoLink) || isValidUrl(req.body.photoLink)) {
+            if (!isValidUrl(req.body.videoLink) || !isValidUrl(req.body.photoLink)) {
                 res.redirect(`/courses/newCourse?msg=5`);
             } else if (!Number.isInteger(parseInt(req.body.money))) {
-            console.log("4")
             res.redirect(`/courses/newCourse?msg=4`);
-        } else if (data.insertedCount === 1) {
-            await courses_c.insertOne(data);
-            res.redirect(`/courses/newCourse?msg=1`);
-        } else { 
-            console.log("2")
-            res.redirect(`/courses/NewCourse?msg=2`);
-        }
+        } else {
+            let insertData = await courses_c.insertOne(data);
+            if(insertData.acknowledged) res.redirect(`/courses/newCourse?msg=1`);
+            else res.redirect(`/courses/NewCourse?msg=2`);
+        } 
         }
     } finally {
     await client.close();
@@ -216,6 +230,10 @@ router.get('/',async (req,res)=>{
     else res.redirect('/');
 }).get('/:courseId', async (req, res)=>{
     const {courseId} = req.params;
+    let msg="";
+    if(req.query.msg==1) msg="評分成功";
+    else if(req.query.msg==2) msg="評分失敗";
+    else if(req.query.msg==3) msg="評分錯誤";
     if(req.session.user&& req.session.user.type=="student"){
         //get single course detail by course id
         try {
@@ -229,8 +247,8 @@ router.get('/',async (req,res)=>{
             } else {
                     let userId = new ObjectId(req.session.user._id);
                     let buyRecords = await buyRecords_c.findOne({courseId:course._id, userId:userId});
-                    if(buyRecords) res.render('courses_detail',{user:req.session.user, course:course, paid:true, title:config.title});
-                    else res.render('courses_detail',{user:req.session.user, course:course, paid:false, title:config.title});
+                    if(buyRecords) res.render('courses_detail',{user:req.session.user, course:course, paid:true, title:config.title, msg:msg});
+                    else res.render('courses_detail',{user:req.session.user, course:course, paid:false, title:config.title,msg:msg});
                   }
                  } else res.redirect('/');
         }finally {
@@ -238,9 +256,32 @@ router.get('/',async (req,res)=>{
         }
     }
     else res.redirect('/');
+}).post('/:courseId', async (req, res)=>{
+    const {courseId} = req.params;
+    if(req.session.user&& req.session.user.type=="student"){
+        try {
+            await client.connect();
+            let data = Number(req.body.rate);
+            if (data >=5.1 || data <=-0.1) {
+                res.redirect(`/courses/${req.params.courseId}?msg=3`);
+            }
+            else {
+                let updateRecords = await buyRecords_c.updateOne({$and:[{userId:new ObjectId(req.session.user._id)}, {courseId:new ObjectId(courseId)}]},{$set:{rate:data}});
+                console.log(updateRecords)
+                console.log("userId",new ObjectId(req.session.user._id))
+                console.log("course",courseId)
+                console.log("data",data)
+                console.log("req",req.body.rate)
+                if(updateRecords.modifiedCount > 0) res.redirect(`/courses/${req.params.courseId}?msg=1`);
+                else res.redirect(`/courses/${req.params.courseId}?msg=2`);
+            }
+        }finally {
+            await client.close();
+        }
+    }
+    else res.redirect('/');
 }).get('/:courseId/buy', async(req, res)=>{
     const {courseId} = req.params;
-    console.log(courseId)
     if(req.session.user&& req.session.user.type=="student"){
     try {
         await client.connect();

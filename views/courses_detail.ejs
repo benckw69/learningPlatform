@@ -22,7 +22,37 @@
           <% if (!paid) { %>
           <tr><td colspan="2"><a href='/courses/<%= course._id %>/buy'>購買課程：$<%= course.money %></a></td></tr>
           <% } %>
-          
+          <% if (paid) { %>
+            <tr><td colspan="2"><form method="post">
+              <label for="rate">評分 (1至5分):</label>
+              <input type="text" id="rating" value="2.5"><br/>
+              <input type="range" id="rate" name="rate" value="2.5" min="0" max="5" step="0.1" onchange=<%="updateTextInput(this.value);"%>>
+              <input type="submit" value="Submit">
+            </form></td></tr>
+            <% } %>
+
     </table>
+    <label for="uname"><b><%= msg %></b></label>
   </body>
 </html>
+
+<script>
+  function updateTextInput(val) {
+    document.getElementById('rating').value=val; 
+  }
+const searchParams = new URLSearchParams(window.location.search);
+
+if(searchParams.get('error') == "true"){
+  document.getElementById('errorTrueText').style.display = "initial";
+}
+else if(searchParams.get('error') == "false"){
+  document.getElementById('errorFalseText').style.display = "initial";
+}
+
+if(checkLogin.getAttribute("paid") == "true"){
+  document.getElementById('paid').style.display = "initial";
+} else {
+  document.getElementById('notpaid').style.display = "initial";
+}
+
+</script>
