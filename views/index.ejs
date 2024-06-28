@@ -5,13 +5,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <video autoplay muted loop id="myVideo">
-      <source src="/media/river.mp4" type="video/mp4">
-    </video>
-    <audio autoplay>
-      <source src="/media/music.m4a" type="audio/mp4">
-    Your browser does not support the audio element.
-    </audio> 
+    <%- include('videoaudio',{}) %>
     <div class="content">
       <h1><%= title %></h1>
 

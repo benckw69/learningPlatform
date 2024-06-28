@@ -3,15 +3,30 @@
   <head>
     <title><%= title %> - 查看付費課程</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/showCourses.css' />
   </head>
   <body>
     <h1><%= title %></h1>
     <%- include('header',{user:user}) %>
-    <ul>
-      <% courses.forEach(course=> { %>
-          <li><a href="/courses/<%= course._id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
-          </li>
-          <% }); %>
-    </ul>
+    <ul id="courses"><% courses.forEach(course=> { %>
+      <li><ul class="course">
+        <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
+        <li>作者： <%= course.author %></li>
+        <li>簡介： <%= course.introduction %></li>
+      </ul></li>
+      <% }); %></ul>
+
+    <% 
+      function category_chinese(name){
+        if(name=="programming") return "程式";
+        else if(name=="music") return "音樂";
+        else if(name=="investment") return "投資";
+        else if(name=="language") return "語言";
+        else if(name=="art") return "藝術";
+        else if(name=="design") return "設計";
+        else if(name=="marketing") return "市場營銷";
+        return "錯誤";
+      }
+    %>
   </body>
 </html>
