@@ -3,12 +3,13 @@ var router = express.Router();
 
 const MongoClient = require('mongodb').MongoClient;
 const config = require('./config');
+const db = config.db;
 const client = new MongoClient(config.url);
 const ObjectId = require('mongodb').ObjectId;
 
-const courses_c = client.db("learningPlatform").collection("courses");
-const courses_u = client.db("learningPlatform").collection("users");
-const buyRecords_c = client.db("learningPlatform").collection("buyRecords");
+const courses_c = client.db(db).collection("courses");
+const courses_u = client.db(db).collection("users");
+const buyRecords_c = client.db(db).collection("buyRecords");
 
 const isValidUrl = urlString=> {
     var urlPattern = new RegExp('^(https?:\\/\\/)?'+ // validate protocol
@@ -53,7 +54,7 @@ router.get('/',async (req,res)=>{
                 
            // console.log("a",courses)
             }
-            if(courses) res.render('courses_all',{user:req.session.user, courses:courses, title:config.title, search:{method:"words",param:""}});
+            if(courses) res.render('courses_all',{user:req.session.user, courses:courses, search:{method:"words",param:""}});
         } finally {
             await client.close();
         }
@@ -75,7 +76,7 @@ router.get('/',async (req,res)=>{
                     let findAuthorName = await users_c.findOne({_id:searchByWords[i].id});
                     searchByWords[i].author = findAuthorName.username;
                 }
-                res.render('courses_all',{user:req.session.user, courses:searchByWords, title:config.title, search:{method:"words",param:searchWords}});
+                res.render('courses_all',{user:req.session.user, courses:searchByWords, search:{method:"words",param:searchWords}});
             } else if(searchMethod == "category"){
                 let {category} = req.body;
                 let searchByCategory;
@@ -86,7 +87,7 @@ router.get('/',async (req,res)=>{
                     let findAuthorName = await users_c.findOne({_id:searchByCategory[i].id});
                     searchByCategory[i].author = findAuthorName.username;
                 }
-                res.render('courses_all',{user:req.session.user, courses:searchByCategory, title:config.title, search:{method:"category",param:category}});
+                res.render('courses_all',{user:req.session.user, courses:searchByCategory, search:{method:"category",param:category}});
             } else if(searchMethod == "tutor"){
                 let {searchWords} = req.body;
                 let searchTutor = await users_c.find({username:{$regex:searchWords}, type:"teacher"}).toArray();
@@ -100,7 +101,7 @@ router.get('/',async (req,res)=>{
                     let findAuthorName = await users_c.findOne({_id:searchByAuthorId[i].id});
                     searchByAuthorId[i].author = findAuthorName.username;
                 }
-                res.render('courses_all',{user:req.session.user, courses:searchByAuthorId, title:config.title, search:{method:"words",param:searchWords}});
+                res.render('courses_all',{user:req.session.user, courses:searchByAuthorId, search:{method:"words",param:searchWords}});
             } 
             else res.redirect('/courses');
         } finally {
@@ -123,9 +124,9 @@ router.get('/',async (req,res)=>{
                 let courseauthor = await courses_u.findOne({_id:courses[i].author});
                 courses[i].author = courseauthor.username;
                 }
-                res.render('courses_paid',{user:req.session.user, courses:courses, title:config.title});
+                res.render('courses_paid',{user:req.session.user, courses:courses});
                      } else {
-                res.render('courses_paid',{user:req.session.user, courses:[], message:"你沒有任何購買紀錄！", title:config.title});
+                res.render('courses_paid',{user:req.session.user, courses:[], message:"你沒有任何購買紀錄！"});
             }
     } finally{
             await client.close();
@@ -151,11 +152,11 @@ router.get('/',async (req,res)=>{
             }
             res.render("courses_myCourses", {
                 user: req.session.user,
-                courses: data,title:config.title
+                courses: data
             });
             } else res.render("courses_myCourses", {
                 user: req.session.user,
-                courses: [],title:config.title
+                courses: []
             });
           
         } finally {
@@ -178,7 +179,7 @@ router.get('/',async (req,res)=>{
               res.render("courses_myCourses_edit", {
                 user: req.session.user,
                 course: data,
-                courseId:req.params._id, title:config.title,msg:msg
+                courseId:req.params._id,msg:msg
               });
             }
         } finally {
@@ -237,7 +238,6 @@ router.get('/',async (req,res)=>{
         else if(req.query.msg==5) msg+="圖片連結或影片連結不是正確的連結"
         res.render('courses_newCourse',{
             user: req.session.user,
-            title:config.title,
             msg:msg});
     }
     else res.redirect('/');
@@ -294,8 +294,8 @@ router.get('/',async (req,res)=>{
             } else {
                     let userId = new ObjectId(req.session.user._id);
                     let buyRecords = await buyRecords_c.findOne({courseId:course._id, userId:userId});
-                    if(buyRecords) res.render('courses_detail',{user:req.session.user, course:course, paid:true, title:config.title, msg:msg});
-                    else res.render('courses_detail',{user:req.session.user, course:course, paid:false, title:config.title,msg:msg});
+                    if(buyRecords) res.render('courses_detail',{user:req.session.user, course:course, paid:true, msg:msg});
+                    else res.render('courses_detail',{user:req.session.user, course:course, paid:false, msg:msg});
                   }
                  } else res.redirect('/');
         }finally {
@@ -343,7 +343,7 @@ router.get('/',async (req,res)=>{
             await courses_u.updateOne({_id:req.session.user._id}, {$set: {money: balance}});
         }
     }
-            res.render('courses_detail',{user:req.session.user, course:course, title:config.title});
+            res.render('courses_detail',{user:req.session.user, course:course});
     } finally {
         await client.close();
     }

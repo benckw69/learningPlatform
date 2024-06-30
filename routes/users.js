@@ -19,9 +19,9 @@ router.get('/', async (req, res) => {
       console.log(req.session.user._id);
       let user = await users_c.findOne({_id:new ObjectId(req.session.user._id)});
       if(user){
-        if(req.session.user.type == "student") res.render('users_view_student', {user:user, title:config.title});
-        else if(req.session.user.type == "teacher") res.render('users_view_teacher', {user:user, title:config.title});
-        else if(req.session.user.type == "admin") res.render('users_view_admin', {user:user, title:config.title});
+        if(req.session.user.type == "student") res.render('users_view_student', {user:user});
+        else if(req.session.user.type == "teacher") res.render('users_view_teacher', {user:user});
+        else if(req.session.user.type == "admin") res.render('users_view_admin', {user:user});
       }
       else {
         res.redirect('/');
@@ -49,9 +49,9 @@ router.get('/', async (req, res) => {
       const users_c = client.db("learningPlatform").collection("users");  
       let user = await users_c.findOne({_id:new ObjectId(req.session.user._id)});
       if(user){
-        if(req.session.user.type == "student") res.render('users_edit_student', {user:user, title:config.title, msg:msg});
-        else if(req.session.user.type == "teacher") res.render('users_edit_teacher', {user:user, title:config.title, msg:msg});
-        else if(req.session.user.type == "admin") res.render('users_edit_admin', {user:user, title:config.title, msg:msg});
+        if(req.session.user.type == "student") res.render('users_edit_student', {user:user, msg:msg});
+        else if(req.session.user.type == "teacher") res.render('users_edit_teacher', {user:user, msg:msg});
+        else if(req.session.user.type == "admin") res.render('users_edit_admin', {user:user, msg:msg});
       }
       else res.redirect('/');
     } finally {

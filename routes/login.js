@@ -11,9 +11,9 @@ const bcrypt = require('bcrypt');
 router.get('/',(req,res)=>{
   if(req.session.user) res.redirect('/');
   else if(!(req.query.type=="student" || req.query.type=="teacher" || req.query.type=="admin")) res.redirect('/');
-  else if(req.query.msg=="1")res.render('login',{user:req.session.user, msg:"登入失敗：密碼輸入錯誤", title:config.title});
-  else if(req.query.msg=="2")res.render('login',{user:req.session.user, msg:"登入失敗：電郵地址輸入錯誤", title:config.title});
-  else res.render('login',{user:req.session.user, msg:"", title:config.title});
+  else if(req.query.msg=="1")res.render('login',{user:req.session.user, msg:"登入失敗：密碼輸入錯誤"});
+  else if(req.query.msg=="2")res.render('login',{user:req.session.user, msg:"登入失敗：電郵地址輸入錯誤"});
+  else res.render('login',{user:req.session.user, msg:""});
 
 }).post('/', async (req,res)=>{
   //handle login request

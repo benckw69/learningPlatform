@@ -14,7 +14,8 @@ const getTitle = async (url)=>{
 
 const url = "mongodb+srv://benckw69:Xp8HRCGYad@cluster0.xhaav3r.mongodb.net/";
 exports.url = url;
-const title_promise = getTitle(url);
-title_promise.then((result)=>{
+const db = "learningPlatform";
+exports.db = db;
+getTitle(url,db).then((result)=>{
     exports.title = result;
 })
