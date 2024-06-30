@@ -19,9 +19,9 @@ router.get('/', async (req, res) => {
       console.log(req.session.user._id);
       let user = await users_c.findOne({_id:new ObjectId(req.session.user._id)});
       if(user){
-        if(req.session.user.type == "student") res.render('users_view_student', {user:user});
-        else if(req.session.user.type == "teacher") res.render('users_view_teacher', {user:user});
-        else if(req.session.user.type == "admin") res.render('users_view_admin', {user:user});
+        if(req.session.user.type == "student") res.render('users_view_student');
+        else if(req.session.user.type == "teacher") res.render('users_view_teacher');
+        else if(req.session.user.type == "admin") res.render('users_view_admin');
       }
       else {
         res.redirect('/');
@@ -49,9 +49,9 @@ router.get('/', async (req, res) => {
       const users_c = client.db("learningPlatform").collection("users");  
       let user = await users_c.findOne({_id:new ObjectId(req.session.user._id)});
       if(user){
-        if(req.session.user.type == "student") res.render('users_edit_student', {user:user, msg:msg});
-        else if(req.session.user.type == "teacher") res.render('users_edit_teacher', {user:user, msg:msg});
-        else if(req.session.user.type == "admin") res.render('users_edit_admin', {user:user, msg:msg});
+        if(req.session.user.type == "student") res.render('users_edit_student', {msg:msg});
+        else if(req.session.user.type == "teacher") res.render('users_edit_teacher', {msg:msg});
+        else if(req.session.user.type == "admin") res.render('users_edit_admin', {msg:msg});
       }
       else res.redirect('/');
     } finally {
@@ -109,7 +109,7 @@ router.get('/', async (req, res) => {
   else if(msgCode=="6") msg = "出現未知錯誤，請登出以確保沒有問題";
   
   if(req.session.user) {
-    res.render('users_edit_password',{user:req.session.user, title:config.title, msg:msg});
+    res.render('users_edit_password',{title:config.title, msg:msg});
   }
   else res.redirect('/');
 

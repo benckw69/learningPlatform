@@ -54,7 +54,7 @@ router.get('/',async (req,res)=>{
                 
            // console.log("a",courses)
             }
-            if(courses) res.render('courses_all',{user:req.session.user, courses:courses, search:{method:"words",param:""}});
+            if(courses) res.render('courses_all',{courses:courses, search:{method:"words",param:""}});
         } finally {
             await client.close();
         }
@@ -76,7 +76,7 @@ router.get('/',async (req,res)=>{
                     let findAuthorName = await users_c.findOne({_id:searchByWords[i].id});
                     searchByWords[i].author = findAuthorName.username;
                 }
-                res.render('courses_all',{user:req.session.user, courses:searchByWords, search:{method:"words",param:searchWords}});
+                res.render('courses_all',{courses:searchByWords, search:{method:"words",param:searchWords}});
             } else if(searchMethod == "category"){
                 let {category} = req.body;
                 let searchByCategory;
@@ -87,7 +87,7 @@ router.get('/',async (req,res)=>{
                     let findAuthorName = await users_c.findOne({_id:searchByCategory[i].id});
                     searchByCategory[i].author = findAuthorName.username;
                 }
-                res.render('courses_all',{user:req.session.user, courses:searchByCategory, search:{method:"category",param:category}});
+                res.render('courses_all',{courses:searchByCategory, search:{method:"category",param:category}});
             } else if(searchMethod == "tutor"){
                 let {searchWords} = req.body;
                 let searchTutor = await users_c.find({username:{$regex:searchWords}, type:"teacher"}).toArray();
@@ -101,7 +101,7 @@ router.get('/',async (req,res)=>{
                     let findAuthorName = await users_c.findOne({_id:searchByAuthorId[i].id});
                     searchByAuthorId[i].author = findAuthorName.username;
                 }
-                res.render('courses_all',{user:req.session.user, courses:searchByAuthorId, search:{method:"words",param:searchWords}});
+                res.render('courses_all',{courses:searchByAuthorId, search:{method:"words",param:searchWords}});
             } 
             else res.redirect('/courses');
         } finally {
@@ -124,9 +124,9 @@ router.get('/',async (req,res)=>{
                 let courseauthor = await courses_u.findOne({_id:courses[i].author});
                 courses[i].author = courseauthor.username;
                 }
-                res.render('courses_paid',{user:req.session.user, courses:courses});
+                res.render('courses_paid',{courses:courses});
                      } else {
-                res.render('courses_paid',{user:req.session.user, courses:[], message:"你沒有任何購買紀錄！"});
+                res.render('courses_paid',{courses:[], message:"你沒有任何購買紀錄！"});
             }
     } finally{
             await client.close();
@@ -151,11 +151,9 @@ router.get('/',async (req,res)=>{
                 }
             }
             res.render("courses_myCourses", {
-                user: req.session.user,
                 courses: data
             });
             } else res.render("courses_myCourses", {
-                user: req.session.user,
                 courses: []
             });
           
@@ -177,7 +175,6 @@ router.get('/',async (req,res)=>{
           let data = await courses_c.findOne({_id:new ObjectId(courseId)});
           if (data) {
               res.render("courses_myCourses_edit", {
-                user: req.session.user,
                 course: data,
                 courseId:req.params._id,msg:msg
               });
@@ -294,8 +291,8 @@ router.get('/',async (req,res)=>{
             } else {
                     let userId = new ObjectId(req.session.user._id);
                     let buyRecords = await buyRecords_c.findOne({courseId:course._id, userId:userId});
-                    if(buyRecords) res.render('courses_detail',{user:req.session.user, course:course, paid:true, msg:msg});
-                    else res.render('courses_detail',{user:req.session.user, course:course, paid:false, msg:msg});
+                    if(buyRecords) res.render('courses_detail',{course:course, paid:true, msg:msg});
+                    else res.render('courses_detail',{course:course, paid:false, msg:msg});
                   }
                  } else res.redirect('/');
         }finally {

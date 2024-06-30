@@ -16,13 +16,13 @@ router.get('/',(req,res)=>{
   if(req.query.msg) msgCode=req.query.msg;
   
   if(req.session.user) res.redirect("/");
-  else if(msgCode=="1") res.render('register',{user:req.session.user, loginText: loginText, type:type, msg:"註冊失敗：兩個輸入密碼並不一致"});
-  else if(msgCode=="2") res.render('register',{user:req.session.user, loginText: loginText, type:type, msg:"註冊失敗：密碼長度未夠8位"});
-  else if(msgCode=="3") res.render('register',{user:req.session.user, loginText: loginText, type:type, msg:"註冊失敗：電郵地址已經存在"});
-  else if(msgCode=="4") res.render('register',{user:req.session.user, loginText: loginText, type:type, msg:"註冊失敗：未能新増紀錄，請再嘗試"});
-  else if(msgCode=="5") res.render('register',{user:req.session.user, loginText: loginText, type:type, msg:"註冊失敗：未能尋找新増紀錄，請再嘗試"});
-  else if(msgCode=="6") res.render('register',{user:req.session.user, loginText: loginText, type:type, msg:"註冊失敗：電郵地址格式錯誤"});
-  else if(type == "student" || type == "teacher") res.render('register',{user:req.session.user, loginText, type:type , msg:""});
+  else if(msgCode=="1") res.render('register',{loginText: loginText, type:type, msg:"註冊失敗：兩個輸入密碼並不一致"});
+  else if(msgCode=="2") res.render('register',{loginText: loginText, type:type, msg:"註冊失敗：密碼長度未夠8位"});
+  else if(msgCode=="3") res.render('register',{loginText: loginText, type:type, msg:"註冊失敗：電郵地址已經存在"});
+  else if(msgCode=="4") res.render('register',{loginText: loginText, type:type, msg:"註冊失敗：未能新増紀錄，請再嘗試"});
+  else if(msgCode=="5") res.render('register',{loginText: loginText, type:type, msg:"註冊失敗：未能尋找新増紀錄，請再嘗試"});
+  else if(msgCode=="6") res.render('register',{loginText: loginText, type:type, msg:"註冊失敗：電郵地址格式錯誤"});
+  else if(type == "student" || type == "teacher") res.render('register',{loginText, type:type , msg:""});
   else res.redirect('/');
 
 }).post('/', async (req, res) => {

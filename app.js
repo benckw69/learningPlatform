@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({secret:"secret string", resave:false, saveUninitialized:true}));
 
 app.use((req,res,next)=>{
-  //res.locals.user = req.user;
+  res.locals.user = req.session.user;
   res.locals.title = config.title;
   res.locals.audio = config.audioLink;
   res.locals.video = config.videoLink;

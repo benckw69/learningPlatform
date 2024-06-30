@@ -4,7 +4,7 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', (req, res)=> {
     if(req.session.user && req.session.user.type=="student") {
-        res.render("game",{user:req.session.user});
+        res.render("game");
     } else res.redirect("/");
     
 });

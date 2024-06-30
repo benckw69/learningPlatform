@@ -7,7 +7,7 @@ router.get('/', (req, res)=> {
   if(req.query.msg == "1") msg = "帳戶已經刪除";
   else if(req.query.msg == "2") msg = "個人資料不存在";
   else if(req.query.msg == "3") msg = "新帳戶成功創立";
-  res.render('index',{pop:msg, user:req.session.user});
+  res.render('index',{pop:msg});
 
 }).get('/logout', (req, res) => {
   //handle logout and redirect to '/'.

@@ -16,7 +16,7 @@ router.get('/insert', (req, res) => {
   else if(msgCode=="5") msg = "兌換現金卷失敗：伺服器無法找到用家，請稍後再嘗試";
   else if(msgCode=="6") msg = "兌換現金卷失敗：伺服器無法新增現金給予用家，請稍後再嘗試";
 
-  if(req.session.user&& req.session.user.type=="student") res.render('moneyTickets_insert', { user:req.session.user, msg:msg });
+  if(req.session.user&& req.session.user.type=="student") res.render('moneyTickets_insert', { msg:msg });
   else res.redirect('/');
 
 }).post('/insert', async(req, res) => {
@@ -60,7 +60,7 @@ router.get('/insert', (req, res) => {
       await client.connect();
       const moneyTickets_c = client.db("learningPlatform").collection("moneyTickets");  
       const moneyTickets = await moneyTickets_c.find().toArray();
-      res.render('moneyTickets_view', { user:req.session.user, moneyTickets:moneyTickets, pop:msg });
+      res.render('moneyTickets_view', { moneyTickets:moneyTickets, pop:msg });
     } finally {
       await client.close();
     }
@@ -73,7 +73,7 @@ router.get('/insert', (req, res) => {
   else if(msgCode=="3") msg = "號碼不能為空，請輸入號碼";
   else if(msgCode=="4") msg = "未能插入新紀錄，請稍後再試";
 
-  if(req.session.user && req.session.user.type=="admin") res.render('moneyTickets_new', { user:req.session.user, msg:msg });
+  if(req.session.user && req.session.user.type=="admin") res.render('moneyTickets_new', { msg:msg });
   else res.redirect('/');
 }).post('/new', async(req,res)=>{
   if(req.session.user && req.session.user.type=="admin") {
