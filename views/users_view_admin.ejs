@@ -6,22 +6,26 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <%- include('header',{user:user}) %>
-    <form action="" method="">
-      <div class="container">
-        <h1>個人資料</h1>
-        <hr>
-    
-        <label for="email"><b>電郵地址</b></label>
-        <input type="text" value="<%= user.email %>" readonly>
-    
-        <label for="username"><b>用戶名稱</b></label>
-        <input type="text" value="<%= user.username %>" readonly>
+    <%- include('video') %>
+    <%- include('audio') %>
+    <div class="content">
+      <h1><%= title %></h1>
+      <%- include('header',{user:user}) %>
+      <form action="" method="">
+        <div class="container">
+          <h1>個人資料</h1>
+          <hr>
+      
+          <label for="email"><b>電郵地址</b></label>
+          <input type="text" value="<%= user.email %>" readonly>
+      
+          <label for="username"><b>用戶名稱</b></label>
+          <input type="text" value="<%= user.username %>" readonly>
 
-        <button type="button" class="registerbtn" onclick="window.location.href='/users/edit/personalInfo'">編輯資料</button>
-        <button type="button" class="registerbtn" onclick="window.location.href='/users/edit/password'">更改密碼</button>
-      </div>
-    </form>
+          <button type="button" class="registerbtn" onclick="window.location.href='/users/edit/personalInfo'">編輯資料</button>
+          <button type="button" class="registerbtn" onclick="window.location.href='/users/edit/password'">更改密碼</button>
+        </div>
+      </form>
+    </div>
   </body>
 </html>

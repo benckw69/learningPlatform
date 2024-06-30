@@ -5,14 +5,18 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1>學習網站</h1>
-    <%- include('header',{user:user}) %>
+    <%- include('video') %>
+    <%- include('audio') %>
+    <div class="content">
+      <h1>學習網站</h1>
+      <%- include('header',{user:user}) %>
 
-    <ul>
-      <% courses.forEach(course=> { %>
-          <li><a href="/courses/myCourses/<%= course._id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
-          </li>
-          <% }); %>
-    </ul>
+      <ul>
+        <% courses.forEach(course=> { %>
+            <li><a href="/courses/myCourses/<%= course._id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
+            </li>
+            <% }); %>
+      </ul>
+    </div>
   </body>
 </html>

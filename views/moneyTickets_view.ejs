@@ -5,15 +5,19 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <%- include('header',{user:user}) %>
-    
-    <table>
-      <tr><th>使用卷代碼</th><th>金錢</th><th>刪除</th></tr>
-      <% moneyTickets.forEach(moneyTicket=> { %>
-        <tr><td><%= moneyTicket.code %></td><td><%= moneyTicket.money %></td><td><button type="button" id="delete" onclick="deleteMoneyTickets('<%= moneyTicket._id %>')">刪除</button></td></tr>
-      <% }); %>
-    </table>
+    <%- include('video') %>
+    <%- include('audio') %>
+    <div class="content">
+      <h1><%= title %></h1>
+      <%- include('header',{user:user}) %>
+      
+      <table>
+        <tr><th>使用卷代碼</th><th>金錢</th><th>刪除</th></tr>
+        <% moneyTickets.forEach(moneyTicket=> { %>
+          <tr><td><%= moneyTicket.code %></td><td><%= moneyTicket.money %></td><td><button type="button" id="delete" onclick="deleteMoneyTickets('<%= moneyTicket._id %>')">刪除</button></td></tr>
+        <% }); %>
+      </table>
+    </div>
     <script>
       const searchParams = new URLSearchParams(window.location.search);
       if(searchParams.get('msg')){

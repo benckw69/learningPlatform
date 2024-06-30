@@ -7,21 +7,25 @@
     <link rel='stylesheet' href='/stylesheets/userView.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <%- include('header',{user:user}) %>
-    
-    <form action="/moneyTickets/insert" method="post">
-      <div class="container">
-        <h1>輸入現金卷</h1>
-        <hr>
-    
-        <label for="email"><b>現金卷號碼</b></label>
-        <input type="text" placeholder="輸入現金卷號碼" name="ticketNum" id="ticketNum" required>
-    
-        <button type="submit" class="registerbtn">送出</button>
-      </div>
-    
-    </form>
-    <label for="uname"><b><%= msg %></b></label>
+    <%- include('video') %>
+    <%- include('audio') %>
+    <div class="content">
+      <h1><%= title %></h1>
+      <%- include('header',{user:user}) %>
+      
+      <form action="/moneyTickets/insert" method="post">
+        <div class="container">
+          <h1>輸入現金卷</h1>
+          <hr>
+      
+          <label for="email"><b>現金卷號碼</b></label>
+          <input type="text" placeholder="輸入現金卷號碼" name="ticketNum" id="ticketNum" required>
+      
+          <button type="submit" class="registerbtn">送出</button>
+        </div>
+      
+      </form>
+      <label for="uname"><b><%= msg %></b></label>
+    </div>
   </body>
 </html>

@@ -6,28 +6,32 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
+    <%- include('video') %>
+    <%- include('audio') %>
+    <div class="content">
+      <h1><%= title %></h1>
 
-    <%- include('header',{user:user}) %>
-    <form action="/users/edit/personalInfo" method="post">
-      <div class="container">
-        <h1>更改個人資料</h1>
-        <hr>
-    
-        <label for="email"><b>電郵地址</b></label>
-        <input type="text" name="email" value="<%= user.email %>" required>
-    
-        <label for="username"><b>用戶名稱</b></label>
-        <input type="text" name="username" value="<%= user.username %>" required>
+      <%- include('header',{user:user}) %>
+      <form action="/users/edit/personalInfo" method="post">
+        <div class="container">
+          <h1>更改個人資料</h1>
+          <hr>
+      
+          <label for="email"><b>電郵地址</b></label>
+          <input type="text" name="email" value="<%= user.email %>" required>
+      
+          <label for="username"><b>用戶名稱</b></label>
+          <input type="text" name="username" value="<%= user.username %>" required>
 
-        <label for="username"><b>密碼</b></label>
-        <input type="password" name="password" required>
+          <label for="username"><b>密碼</b></label>
+          <input type="password" name="password" required>
 
-        <button type="submit" class="registerbtn" >更改資料</button>
-        
-        <button type="button" class="registerbtn" style="background-color:blue" onclick="window.location.href='/users'">回到上一頁</button>
-      </div>
-      <label for="uname" ><b><%= msg %></b></label>
-    </form>
+          <button type="submit" class="registerbtn" >更改資料</button>
+          
+          <button type="button" class="registerbtn" style="background-color:blue" onclick="window.location.href='/users'">回到上一頁</button>
+        </div>
+        <label for="uname" ><b><%= msg %></b></label>
+      </form>
+    </div>
   </body>
 </html>

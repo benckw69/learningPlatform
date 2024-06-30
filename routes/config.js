@@ -1,3 +1,8 @@
+const url = "mongodb+srv://benckw69:Xp8HRCGYad@cluster0.xhaav3r.mongodb.net/";
+const db = "learningPlatform";
+const audioLink = "/media/music.m4a";
+const videoLink = "/media/river.mp4"
+
 const getTitle = async (url)=>{
     const MongoClient = require('mongodb').MongoClient;
     const client = new MongoClient(url);
@@ -12,10 +17,12 @@ const getTitle = async (url)=>{
     }
 }
 
-const url = "mongodb+srv://benckw69:Xp8HRCGYad@cluster0.xhaav3r.mongodb.net/";
-exports.url = url;
-const db = "learningPlatform";
-exports.db = db;
 getTitle(url,db).then((result)=>{
     exports.title = result;
 })
+
+exports.url = url;
+exports.db = db;
+exports.audioLink = audioLink;
+exports.videoLink = videoLink;
+

@@ -6,46 +6,50 @@
         <link rel='stylesheet' href='/stylesheets/userView.css' />
     </head>
     <body>
-        <h1><%= title %></h1>
-        <%- include('header',{user:user}) %>
-        
-        <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform">
-            <div class="container">
-                <h1 id="registerText">課程資料</h1>
-                <hr>
-                
-                <label for="name"><b>課程名稱</b></label>
-                <input type="text" placeholder="請輸入名稱" name="name" id="name" value="<%= course.name %>" required>
-                
-                <br><label for="name"><b>簡介</b></label><br>
-                <textarea rows = "5" cols = "60" name = "introduction" form="courseform" required><%= course.introduction %></textarea> <br/>
-
-                <br><label for="name"><b>內容</b></label><br>
-                <textarea rows = "5" cols = "60" name = "content" form="courseform" required><%= course.content %></textarea> <br/>
-
-                <br><label for="name"><b>學習的人能夠得到甚麼</b></label><br>
-                <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required><%= course.whatPeopleLearn %></textarea> <br/>
-
-                <label for="name"><b>圖片連結</b></label>
-                <input type="text" placeholder="請輸入連結" name="photoLink" id="photoLink" value="<%= course.photoLink %>" required>
-
-                <label for="name"><b>影片連結</b></label>
-                <input type="text" placeholder="請輸入連結" name="videoLink" id="videoLink" value="<%= course.videoLink %>" required>
-
-                <label for="name"><b>課程價錢</b></label>
-                <input type="text" placeholder="輸入價錢" name="money" id="money" value="<%= course.money %>" required>
+        <%- include('video') %>
+        <%- include('audio') %>
+        <div class="content">
+            <h1><%= title %></h1>
+            <%- include('header',{user:user}) %>
             
-                <label for="name"><b>課程分類</b></label>
-                <input type="text" placeholder="輸入分類" name="category" id="category" value="<%= course.category %>" required>
+            <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform">
+                <div class="container">
+                    <h1 id="registerText">課程資料</h1>
+                    <hr>
+                    
+                    <label for="name"><b>課程名稱</b></label>
+                    <input type="text" placeholder="請輸入名稱" name="name" id="name" value="<%= course.name %>" required>
+                    
+                    <br><label for="name"><b>簡介</b></label><br>
+                    <textarea rows = "5" cols = "60" name = "introduction" form="courseform" required><%= course.introduction %></textarea> <br/>
+
+                    <br><label for="name"><b>內容</b></label><br>
+                    <textarea rows = "5" cols = "60" name = "content" form="courseform" required><%= course.content %></textarea> <br/>
+
+                    <br><label for="name"><b>學習的人能夠得到甚麼</b></label><br>
+                    <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required><%= course.whatPeopleLearn %></textarea> <br/>
+
+                    <label for="name"><b>圖片連結</b></label>
+                    <input type="text" placeholder="請輸入連結" name="photoLink" id="photoLink" value="<%= course.photoLink %>" required>
+
+                    <label for="name"><b>影片連結</b></label>
+                    <input type="text" placeholder="請輸入連結" name="videoLink" id="videoLink" value="<%= course.videoLink %>" required>
+
+                    <label for="name"><b>課程價錢</b></label>
+                    <input type="text" placeholder="輸入價錢" name="money" id="money" value="<%= course.money %>" required>
                 
-                <hr>
+                    <label for="name"><b>課程分類</b></label>
+                    <input type="text" placeholder="輸入分類" name="category" id="category" value="<%= course.category %>" required>
+                    
+                    <hr>
+                    
+                    <button type="submit" class="registerbtn">更改資料</button>
+                </div>
                 
-                <button type="submit" class="registerbtn">更改資料</button>
-            </div>
-            
-            <label for="uname"><b><%= msg %></b></label>
-            <p><a href="/courses/myCourses">回到上一頁</a></p>
-        </form> 
+                <label for="uname"><b><%= msg %></b></label>
+                <p><a href="/courses/myCourses">回到上一頁</a></p>
+            </form> 
+        </div>
     </body>
     </html>
     <script>

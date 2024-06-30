@@ -60,39 +60,3 @@ a {
   background-color: #111;
 }
 
-/* courses layout */
-ul.course li, ul#courses{
-  list-style-type: none;
-  margin-bottom:3px;
-}
-
-#form {
-  width:100%; 
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-#courses{
-  padding-left: 10px;
-}
-
-.course{
-  margin-bottom: 20px;
-  padding-left: 5px;
-  
-}
-
-#searchWords, #category{
-  width: 300px;
-  padding: 5px;
-  margin-right: 10px;
-}
-#searchMethod, #submit{
-  padding: 5px;
-  margin-right: 10px;
-}
-
-.course li a {
-  font-size: 20px;
-}
-

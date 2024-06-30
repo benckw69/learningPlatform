@@ -6,49 +6,53 @@
         <link rel='stylesheet' href='/stylesheets/userView.css' />
     </head>
     <body>
-        <h1><%= title %></h1>
-        <%- include('header',{user:user}) %>
-        
-        <form action="/courses/newCourse/" method="post" id="courseform">
-            <div class="container">
-                <h1 id="registerText">課程資料</h1>
-                <hr>
-                
-                <label for="name"><b>課程名稱</b></label>
-                <input type="text" placeholder="請輸入名稱" name="name" id="name" required>
-                
-                <br><label for="name"><b>簡介</b></label><br>
-                <textarea rows = "5" cols = "60" name = "introduction" form="courseform" required></textarea> <br/>
-
-                <br><label for="name"><b>內容</b></label><br>
-                <textarea rows = "5" cols = "60" name = "content" form="courseform" required></textarea> <br/>
-
-                <br><label for="name"><b>學習的人能夠得到甚麼</b></label><br>
-                <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required></textarea> <br/>
-
-                <label for="name"><b>圖片連結</b></label>
-                <input type="text" placeholder="請輸入連結" name="photoLink" id="photoLink" required>
-
-                <label for="name"><b>影片連結</b></label>
-                <input type="text" placeholder="請輸入連結" name="videoLink" id="videoLink" required>
-
-                <label for="name"><b>課程價錢</b></label>
-                <input type="text" placeholder="輸入價錢" name="money" id="money" required>
+        <%- include('video') %>
+        <%- include('audio') %>
+        <div class="content">
+            <h1><%= title %></h1>
+            <%- include('header',{user:user}) %>
             
-                <label for="name"><b>課程分類</b></label><br>
-                <select name="category" required>
-                    <option value="programming">程式</option>
-                    <option value="art">藝術</option>
-                    <option value="marketing">市場營銷</option>
-                    <option value="music">音樂</option>
-                  </select>
+            <form action="/courses/newCourse/" method="post" id="courseform">
+                <div class="container">
+                    <h1 id="registerText">課程資料</h1>
+                    <hr>
+                    
+                    <label for="name"><b>課程名稱</b></label>
+                    <input type="text" placeholder="請輸入名稱" name="name" id="name" required>
+                    
+                    <br><label for="name"><b>簡介</b></label><br>
+                    <textarea rows = "5" cols = "60" name = "introduction" form="courseform" required></textarea> <br/>
+
+                    <br><label for="name"><b>內容</b></label><br>
+                    <textarea rows = "5" cols = "60" name = "content" form="courseform" required></textarea> <br/>
+
+                    <br><label for="name"><b>學習的人能夠得到甚麼</b></label><br>
+                    <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required></textarea> <br/>
+
+                    <label for="name"><b>圖片連結</b></label>
+                    <input type="text" placeholder="請輸入連結" name="photoLink" id="photoLink" required>
+
+                    <label for="name"><b>影片連結</b></label>
+                    <input type="text" placeholder="請輸入連結" name="videoLink" id="videoLink" required>
+
+                    <label for="name"><b>課程價錢</b></label>
+                    <input type="text" placeholder="輸入價錢" name="money" id="money" required>
                 
-                <hr>
+                    <label for="name"><b>課程分類</b></label><br>
+                    <select name="category" required>
+                        <option value="programming">程式</option>
+                        <option value="art">藝術</option>
+                        <option value="marketing">市場營銷</option>
+                        <option value="music">音樂</option>
+                    </select>
+                    
+                    <hr>
+                    
+                    <button type="submit" class="registerbtn">新增課程</button>
+                </div>
                 
-                <button type="submit" class="registerbtn">新增課程</button>
-            </div>
-            
-            <label for="uname"><b><%= msg %></b></label>
-        </form> 
+                <label for="uname"><b><%= msg %></b></label>
+            </form> 
+        </div>
     </body>
     </html>

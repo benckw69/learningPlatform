@@ -6,19 +6,23 @@
         <link rel='stylesheet' href='/stylesheets/style.css' />
     </head>
     <body>
-        <h1><%= title %></h1>
-        <%- include('header',{user:user}) %>
-        <form action="/moneyTickets/new" method="post">
-            <div class="container">
-            <h1>添加使用卷</h1>
-            <label for="email"><b>換領代碼</b></label>
-            <input type="text" name="code" required>
-            <label for="name"><b>面額</b></label>
-            <input type="text" name="money" required>
-            <button type="submit" class="registerbtn" >添加使用卷</button>
-            </div>
-            <label for="uname"><b><%= msg %></b></label>
-        </form>
+        <%- include('video') %>
+        <%- include('audio') %>
+        <div class="content">
+            <h1><%= title %></h1>
+            <%- include('header',{user:user}) %>
+            <form action="/moneyTickets/new" method="post">
+                <div class="container">
+                <h1>添加使用卷</h1>
+                <label for="email"><b>換領代碼</b></label>
+                <input type="text" name="code" required>
+                <label for="name"><b>面額</b></label>
+                <input type="text" name="money" required>
+                <button type="submit" class="registerbtn" >添加使用卷</button>
+                </div>
+                <label for="uname"><b><%= msg %></b></label>
+            </form>
+        </div>
     </body>
     <script>
         const searchParams = new URLSearchParams(window.location.search);

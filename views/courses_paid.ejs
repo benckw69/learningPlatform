@@ -6,16 +6,19 @@
     <link rel='stylesheet' href='/stylesheets/showCourses.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <%- include('header',{user:user}) %>
-    <ul id="courses"><% courses.forEach(course=> { %>
-      <li><ul class="course">
-        <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
-        <li>作者： <%= course.author %></li>
-        <li>簡介： <%= course.introduction %></li>
-      </ul></li>
-      <% }); %></ul>
-
+    <%- include('video') %>
+    <%- include('audio') %>
+    <div class="content">
+      <h1><%= title %></h1>
+      <%- include('header',{user:user}) %>
+      <ul id="courses"><% courses.forEach(course=> { %>
+        <li><ul class="course">
+          <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
+          <li>作者： <%= course.author %></li>
+          <li>簡介： <%= course.introduction %></li>
+        </ul></li>
+        <% }); %></ul>
+    </div>
     <% 
       function category_chinese(name){
         if(name=="programming") return "程式";
