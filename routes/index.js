@@ -10,7 +10,6 @@ router.get('/', (req, res)=> {
   res.render('index',{pop:msg});
 
 }).get('/logout', (req, res) => {
-  //handle logout and redirect to '/'.
   delete req.session.user;
   res.redirect("/");
 }).get('/*', (req, res) => {

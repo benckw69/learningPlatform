@@ -2,38 +2,39 @@ var express = require('express');
 var router = express.Router();
 
 const MongoClient = require('mongodb').MongoClient;
-const config = require('./config');
-const client = new MongoClient(config.url);
-const ObjectId = require('mongodb').ObjectId;
+const {url,db} = require('./config');
+const auth = require('./auth');
+const client = new MongoClient(url);
+const users_c = client.db(db).collection("users");
 const bcrypt = require('bcrypt');
 
 /* GET login page. */
-router.get('/',(req,res)=>{
-  if(req.session.user) res.redirect('/');
-  else if(!(req.query.type=="student" || req.query.type=="teacher" || req.query.type=="admin")) res.redirect('/');
-  else if(req.query.msg=="1")res.render('login',{msg:"登入失敗：密碼輸入錯誤"});
-  else if(req.query.msg=="2")res.render('login',{msg:"登入失敗：電郵地址輸入錯誤"});
-  else res.render('login',{user:req.session.user, msg:""});
+router.get('/',auth.isNotlogin,(req,res)=>{
+  res.render('login');
 
-}).post('/', async (req,res)=>{
+}).post('/',auth.isNotlogin, async (req,res)=>{
   //handle login request
-  let type;
-  if(req.query.type) type=req.query.type;
+  let type=req.query.type;
+  req.session.messages = [];
 
   let email = req.body.email, password = req.body.password;
   //take data from database to check whether can login
   try {
     await client.connect();
-    const users = client.db("learningPlatform").collection("users");
-    let user = await users.findOne({email:email, type:type});
+    let user = await users_c.findOne({email:email, type:type});
     
     if(user){
       if(bcrypt.compareSync(password, user.password)){
         req.session.user = user;
         res.redirect('/');
       }
-      else res.redirect('/login?type='+type+'&msg=1');
-    } else res.redirect('/login?type='+type+'&msg=2');
+      else {
+        req.session.messages.push("登入失敗：密碼輸入錯誤");
+        res.redirect('/login?type='+type);
+      }
+    } else {
+      req.session.messages.push("登入失敗：電郵地址輸入錯誤");
+      res.redirect('/login?type='+type);}
   } finally {
       await client.close();
   }

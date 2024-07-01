@@ -11,9 +11,9 @@
     <div class="content">
       <h1><%= title %></h1>
       <%- include('header',{user:user}) %>
-      <h2><%= loginText %></h2>
+      <h2 id="loginText"></h2>
       <hr>
-      <form action="/register?type=<%= type %>" method="post">
+      <form id="form" action="" method="post">
 
         <p><label for="email"><b>電郵地址</b></label></p>
         <input type="email" placeholder="輸入電郵" name="email" required>
@@ -31,9 +31,28 @@
         <button type="submit" class="registerbtn">註冊</button>
 
       </form> 
-      <p>已經有帳戶?請<a href="/login?type=<%= type %>" id="loginAction">登入</a></p>
+      <p>已經有帳戶?請<a href="" id="loginAction">登入</a></p>
       
-      <label for="uname"><b><%= msg %></b></label>
+      <% if (messages) { %>
+        <section class="messages">
+          <% messages.forEach(function(message) { %>
+            <p><b><%= message %></b></p>
+          <% }); %>
+        </section>
+      <% } %>
     </div>
+    <script>
+      const searchParams = new URLSearchParams(window.location.search);
+      if(searchParams.get('type')=="student"){
+        document.getElementById('loginText').textContent = "學生註冊";
+        document.getElementById('form').setAttribute("action", "/register?type=student");
+        document.getElementById('loginAction').setAttribute('href', "/login?type=student");
+      }
+      else {
+        document.getElementById('loginText').textContent = "老師註冊";
+        document.getElementById('form').setAttribute("action", "/register?type=teacher");
+        document.getElementById('loginAction').setAttribute('href', "/login?type=teacher");
+      }
+    </script>
   </body>
 </html>

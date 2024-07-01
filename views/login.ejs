@@ -26,7 +26,15 @@
           <p id="haveAccountText">已經有帳戶?請<a href="/" id="registerAction">註冊</a></p>
         </div>
       </form> 
-      <label for="uname" ><b><%= msg %></b></label>
+
+      <% if (messages) { %>
+        <section class="messages">
+          <% messages.forEach(function(message) { %>
+            <p><b><%= message %></b></p>
+          <% }); %>
+        </section>
+      <% } %>
+      
     </div>
     <script>
       const searchParams = new URLSearchParams(window.location.search);
