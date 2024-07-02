@@ -26,7 +26,7 @@
           <input type="text" value="<%= user.money %>" readonly>
 
           <button type="button" class="registerbtn" id="editButton" onclick="window.location.href='/users/edit/personalInfo'">編輯個人資料</button>
-          <button type="button" class="registerbtn" onclick="window.location.href='/users/edit/password'">更改密碼</button>
+          <button type="button" class="registerbtn" id="changePw" onclick="window.location.href='/users/edit/password'">更改密碼</button>
           <button type="button" class="registerbtn" style="background-color: red;" id="delete" onclick="deleteUser()">刪除帳戶</button>
         </div>  
       </form>
@@ -37,6 +37,7 @@
           window.location.replace('/users/delete');
         }
       }
+      if('<%= user.method %>' == "google") document.getElementById('changePw').style.display = "none";
     </script>
   </body>
 </html>

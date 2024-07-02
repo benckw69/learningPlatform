@@ -33,5 +33,8 @@
         <label for="uname" ><b><%= msg %></b></label>
       </form>
     </div>
+    <script>
+      if('<%= user.method %>' == "google") document.getElementById('email').readOnly = true;
+    </script>
   </body>
 </html>
