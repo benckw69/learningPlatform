@@ -10,7 +10,7 @@
     <%- include('audio') %>
     <div class="content">
       <h1><%= title %></h1>
-      <%- include('header',{user:user}) %>
+      <%- include('header') %>
       <ul id="courses"><% courses.forEach(course=> { %>
         <li><ul class="course">
           <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
