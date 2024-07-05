@@ -11,12 +11,15 @@
       <h1>學習網站</h1>
       <%- include('header') %>
 
-      <ul>
-        <% courses.forEach(course=> { %>
-            <li><a href="/courses/myCourses/<%= course._id %>" >Course Name: <%= course.name %>, Author: <%= course.author %>, Money: <%= course.money %> </a>
-            </li>
-            <% }); %>
-      </ul>
+      <ul id="courses"><% courses.forEach(course=> { %>
+      <li><ul class="course">
+        <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
+        <li>作者： <%= course.author %></li>
+        <li>簡介： <%= course.introduction %></li>
+        <li>價錢： <%= course.money %> </li>
+        <li>評價： <%= course.rate %> </li>
+      </ul></li>
+      <% }); %></ul>
     </div>
   </body>
 </html>
