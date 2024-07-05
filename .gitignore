@@ -2,3 +2,7 @@
 node_modules/*
 
 views/test.ejs
+
+.env
+
+routes/config.js
