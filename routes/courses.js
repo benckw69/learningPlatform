@@ -288,7 +288,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 res.send("無法連接到伺服器，請重新嘗試。")
             } else {
                 let userId = new ObjectId(req.user._id);
-                let buyRecords = await buyRecords_c.findOne({courseId:course._id, userId:userId});
+                let courseId = courses._id;
+                let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
                 if(buyRecords) res.render('courses_detail',{course:courses, paid:true, msg:msg});
                 else res.render('courses_detail',{course:courses, paid:false, msg:msg});
                 }

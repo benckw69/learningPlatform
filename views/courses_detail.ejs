@@ -32,7 +32,7 @@
                 <input type="range" id="rate" name="rate" value="<%= course.data || '2.5' ) %>" min="0" max="5" step="0.1" onchange=<%="updateTextInput(this.value);"%>>
                 <input type="submit" value="Submit">
               </form></td></tr>
-              <% } %>
+            <% } %>
 
       </table>
       <label for="uname"><b><%= msg %></b></label>
@@ -44,19 +44,5 @@
   function updateTextInput(val) {
     document.getElementById('rating').value=val; 
   }
-const searchParams = new URLSearchParams(window.location.search);
-
-if(searchParams.get('error') == "true"){
-  document.getElementById('errorTrueText').style.display = "initial";
-}
-else if(searchParams.get('error') == "false"){
-  document.getElementById('errorFalseText').style.display = "initial";
-}
-
-if(checkLogin.getAttribute("paid") == "true"){
-  document.getElementById('paid').style.display = "initial";
-} else {
-  document.getElementById('notpaid').style.display = "initial";
-}
 
 </script>
