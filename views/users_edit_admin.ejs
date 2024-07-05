@@ -30,7 +30,13 @@
           
           <button type="button" class="registerbtn" style="background-color:blue" onclick="window.location.href='/users'">回到上一頁</button>
         </div>
-        <label for="uname" ><b><%= msg %></b></label>
+        <% if (messages) { %>
+          <section class="messages">
+            <% messages.forEach(function(message) { %>
+              <p><b><%= message %></b></p>
+            <% }); %>
+          </section>
+        <% } %>
       </form>
     </div>
   </body>
