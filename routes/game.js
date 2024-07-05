@@ -1,11 +1,10 @@
 var express = require('express');
 var router = express.Router();
+const auth = require('./auth');
 
 /* GET home page. */
-router.get('/', (req, res)=> {
-    if(req.session.user && req.session.user.type=="student") {
-        res.render("game");
-    } else res.redirect("/");
+router.get('/', auth.isloginByStudent, (req, res)=> {
+    res.render("game");
     
 });
 

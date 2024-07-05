@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const auth = require('./auth');
 
 /* GET home page. */
 router.get('/', (req, res)=> {
@@ -9,9 +10,10 @@ router.get('/', (req, res)=> {
   else if(req.query.msg == "3") msg = "新帳戶成功創立";
   res.render('index',{pop:msg});
 
-}).get('/logout', (req, res) => {
-  delete req.session.user;
-  res.redirect("/");
+}).get('/logout', auth.isloginByStudentAndTeacher, (req, res) => {
+  req.logout((err)=>{
+    res.redirect("/");
+  })
 }).get('/*', (req, res) => {
   //for other sites, redirect to the index page.
   res.redirect('/');
