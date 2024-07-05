@@ -28,8 +28,8 @@
             <% if (paid) { %>
               <tr><td colspan="2"><form method="post">
                 <label for="rate">評分 (1至5分):</label>
-                <input type="text" id="rating" value="2.5"><br/>
-                <input type="range" id="rate" name="rate" value="2.5" min="0" max="5" step="0.1" onchange=<%="updateTextInput(this.value);"%>>
+                <input type="text" id="rating" value="<%= course.data || '2.5'  ) %>" ><br/>
+                <input type="range" id="rate" name="rate" value="<%= course.data || '2.5' ) %>" min="0" max="5" step="0.1" onchange=<%="updateTextInput(this.value);"%>>
                 <input type="submit" value="Submit">
               </form></td></tr>
               <% } %>
