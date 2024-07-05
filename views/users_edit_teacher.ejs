@@ -17,7 +17,7 @@
         <hr>
     
         <label for="email"><b>電郵地址</b></label>
-        <input type="text" name="email" value="<%= user.email %>" required>
+        <input type="text" name="email" id="email" value="<%= user.email %>" required>
     
         <label for="username"><b>用戶名稱</b></label>
         <input type="text" name="username" value="<%= user.username %>" required>
@@ -25,8 +25,8 @@
         <label for="username"><b>個人簡介</b></label>
         <input type="text" name="introduction" value="<%= user.introduction %>" required>
 
-        <label for="username"><b>密碼</b></label>
-        <input type="password" name="password" required>
+        <label for="username" id="passwordText"><b>密碼</b></label>
+        <input type="password" name="password" id="password">
 
         <button type="submit" class="registerbtn">更改資料</button>
 
@@ -36,7 +36,11 @@
       <label for="uname" ><b><%= msg %></b></label>
     </form>
     <script>
-      if('<%= user.method %>' == "google") document.getElementById('email').readOnly = true;
+      if('<%= user.loginMethod %>' == "google") {
+        document.getElementById('email').readOnly = true;
+        document.getElementById('password').style.display = "none";
+        document.getElementById('passwordText').style.display = "none";
+      }
     </script>
   </body>
 </html>

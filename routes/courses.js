@@ -323,7 +323,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             await courses_u.updateOne({_id:req.user._id}, {$set: {money: balance}});
         }
     }
-            res.render('courses_detail',{user:req.user, course:course});
+            res.render('courses_detail',{course:course});
     } finally {
         await client.close();
     }

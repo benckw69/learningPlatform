@@ -37,7 +37,8 @@
           window.location.replace('/users/delete');
         }
       }
-      if('<%= user.method %>' == "google") document.getElementById('changePw').style.display = "none";
+      if('<%= user.loginMethod %>' == "google") document.getElementById('changePw').style.display = "none";
+      
     </script>
   </body>
 </html>

@@ -23,6 +23,8 @@
       
           <button type="submit" class="registerbtn">登入</button>
           <br/>
+          <button type="button" class="registerbtn" id="googleLogin" onclick="window.location.href='/login/google/'">Google 登入</button>
+          <br/>
           <p id="haveAccountText">已經有帳戶?請<a href="/" id="registerAction">註冊</a></p>
         </div>
       </form> 
@@ -43,14 +45,21 @@
         document.getElementById('loginText').textContent = "學生登入";
         document.getElementById('registerAction').setAttribute("href","/register?type=student");
         document.getElementById('form').setAttribute("action","/login?type=student");
+        document.getElementById('googleLogin').onclick = function(){
+          window.location.href='/login/google/student';
+        }
       } else if (searchParams.get('type')=="teacher") {
         document.getElementById('loginText').textContent = "老師登入";
         document.getElementById('registerAction').setAttribute("href","/register?type=teacher");
         document.getElementById('form').setAttribute("action","/login?type=teacher");
+        document.getElementById('googleLogin').onclick = function(){
+          window.location.href='/login/google/teacher';
+        }
       } else if (searchParams.get('type')=="admin"){
         document.getElementById('loginText').textContent = "管理者登入";
         document.getElementById('form').setAttribute("action","/login?type=admin");
         document.getElementById('haveAccountText').style.display = "none";
+        document.getElementById('googleLogin').style.display = "none";
       } 
 
     </script>

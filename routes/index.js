@@ -10,8 +10,9 @@ router.get('/', (req, res)=> {
   else if(req.query.msg == "3") msg = "新帳戶成功創立";
   res.render('index',{pop:msg});
 
-}).get('/logout', auth.isloginByStudentAndTeacher, (req, res) => {
+}).get('/logout', auth.islogin, (req, res) => {
   req.logout((err)=>{
+    console.log(req.user);
     res.redirect("/");
   })
 }).get('/*', (req, res) => {

@@ -65,13 +65,13 @@ router.get('/', auth.islogin, async (req, res) => {
   if (!validator.validate(user_new.email)) res.redirect('/users/edit/personalInfo?msg=5');
   else if (user_new.username.length == 0) res.redirect('/users/edit/personalInfo?msg=6');
   else if (req.user.type=="teacher" && user_new.introduction.length == 0) res.redirect('/users/edit/personalInfo?msg=7');
-  else if(!bcrypt.compareSync(req.body.password, req.user.password)) res.redirect('/users/edit/personalInfo?msg=2');
+  else if(!req.user.loginMethod=="google" && !bcrypt.compareSync(req.body.password, req.user.password)) res.redirect('/users/edit/personalInfo?msg=2');
   else {
     try{
       await client.connect();
       const users_c = client.db("learningPlatform").collection("users");
       const email_repeat = await users_c.findOne({email:req.body.email, type:req.user.type});
-      if(email_repeat && email_repeat._id.toString() != req.user._id) res.redirect('/users/edit/personalInfo?msg=8');
+      if(!req.user.loginMethod=="google" && email_repeat && email_repeat._id.toString() != req.user._id) res.redirect('/users/edit/personalInfo?msg=8');
       else{
         delete user_new._id;
         const result = await users_c.replaceOne({_id:new ObjectId(req.user._id)}, user_new);

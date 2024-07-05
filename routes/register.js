@@ -35,14 +35,17 @@ router.get('/',auth.isNotlogin,(req,res)=>{
         const saltRounds = 10;
         const salt = bcrypt.genSaltSync(saltRounds);
         const hash = bcrypt.hashSync(password, salt);
-        let userData = {type:type, email:req.body.email, username:username, password:hash};
+        let userData = {type:type, email:req.body.email, username:username, password:hash, loginMethod:"email"};
         if(type == "student" || type == "teacher") userData.money = 0;
         if(type == "teacher") userData.introduction = "";
         const user = await users_c.insertOne(userData);
+
         //check whether data are inserted.  Find back the inserted data
         if(user.acknowledged) {
-          const newUser = await users_c.findOne({email:email, type:type});
-          if(newUser) req.session.user = newUser;
+          const newUser = await users_c.findOne({email:email, type:type, loginMethod:"email"});
+          if(newUser) {req.login(newUser,(err)=>{
+            if(err) req.session.messages.push("出現問題，請重試");
+          })}
           else req.session.messages.push("註冊失敗：未能尋找新増紀錄，請再嘗試");
         }
         else req.session.messages.push("註冊失敗：未能新増紀錄，請再嘗試");

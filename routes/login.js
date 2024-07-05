@@ -10,6 +10,7 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const GoogleStrategy = require('passport-google-oidc');
+require('dotenv').config();
 
 passport.use(new LocalStrategy(
   {
@@ -32,17 +33,15 @@ passport.use(new LocalStrategy(
 ));
 
 passport.use(new GoogleStrategy({
-  clientID: GOOGLE_CLIENT_ID,
-  clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "/loginByPassport/oauth",
+  clientID: process.env['GOOGLE_CLIENT_ID'],
+  clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
+  callbackURL: "/login/oauth/google",
   scope: [ 'profile', 'email' ],
   passReqToCallback: true
 },
 async function verify(req, issuer, profile, cb) {
   //firstly, check whether user exist.
-  console.log();
   let type = req.session.type;
-  delete req.session.type;
   console.log(profile);
   try{
     await client.connect();
@@ -69,6 +68,15 @@ router.get('/',auth.isNotlogin,(req,res)=>{
     failureRedirect: '/login?type='+req.query.type,
     failureMessage: true });
     callback(req, res, next);
+}).get('/google/:type', (req,res,next)=>{
+  req.session.type = req.params.type;
+  passport.authenticate('google')(req,res,next);
+}).get('/oauth/google',passport.authenticate('google', { failureRedirect: '/login/google/fail', failureMessage: true }), function(req, res) {
+  res.redirect('/');
+}).get('/google/fail',(req,res)=>{
+  let type = res.session.type;
+  delete res.session.type;
+  res.redirect('/login?type='+type);
 });
 
 module.exports = router;
