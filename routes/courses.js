@@ -29,32 +29,46 @@ router.get('/',async (req,res)=>{
         try {
             await client.connect();
             let courses = await courses_c.find().toArray();
-            let buyRecords = await buyRecords_c.find().toArray();
-        //convert author names from _id to their username
+        //map all authors and course ids into arrays from all courses
             let courseauthor_a = courses.map((courses)=>courses.author);
-            let coursematch_a = courses.map((courses)=>courses._id);
-            console.log("b",coursematch_a)
+            let coursematch = courses.map((courses)=>courses._id);
+
+            //for courses in database, convert author names from _id to their related username
             for (let i=0;i<courses.length;i++) {
-            let courseauthor_b = await courses_u.findOne({_id:new ObjectId(courseauthor_a[i])});
-
+            let courseauthor_b = await courses_u.findOne({_id:new ObjectId(courseauthor_a[i])}); //get all author data by author id
             courses[i].author = courseauthor_b.username;
+            courses[i].rate = 0;
             }
 
-            //
-            let coursematch = [];
-            for (let i=0;i<coursematch_a.length;i++) {
-                coursematch.push([]);
-                let coursematch_b = await buyRecords_c.find({courseId:new ObjectId(coursematch_a[i])}).toArray();
-                for(let j=0;j<coursematch_b.length;j++){
-                    if(coursematch_b[j].rate) coursematch[i].push(coursematch_b[j].rate);
-                    console.log("c",coursematch_b)
-                    console.log("a",coursematch)
-                }
+            //define maps for courses rating
+            let ratings=new Map();
+            let courseCount=new Map();
 
-                
-           // console.log("a",courses)
+            //for courses in database, calculate their related average rating
+            for (let i=0;i<coursematch.length;i++) { //for total course numbers
+                let records = await buyRecords_c.find({courseId:new ObjectId(coursematch[i])}).toArray(); //retrieve all buying records by course id
+
+                //for courses in database, calculate the average, then push the result into ratings
+                for(let j=0;j<records.length;j++){ //for how many buying records do course[i] have
+                    if (records[j].rate) {
+                        let thiscourseId = records[j].courseId.toHexString();
+                        if (!ratings.has(thiscourseId)) {
+                          ratings.set(thiscourseId, 0);
+                          courseCount.set(thiscourseId, 0);
+                        }
+                        ratings.set(thiscourseId, ratings.get(thiscourseId) + records[j].rate);
+                        courseCount.set(thiscourseId, courseCount.get(thiscourseId) + 1);
+                        let currentcourseId = coursematch[i].toHexString();
+                    if (ratings.has(currentcourseId)) {
+                        let averageRating = ratings.get(currentcourseId) / courseCount.get(currentcourseId);
+                            courses[i].rate = averageRating.toPrecision(2);
+                    } else {
+                            courses[i].rate = 0;
+                    }
+                      }
             }
-            if(courses) res.render('courses_all',{courses:courses, search:{method:"words",param:""}});
+        }
+            if(courses) res.render('courses_all',{courses:courses, rate:ratings, search:{method:"words",param:""}});
         } finally {
             await client.close();
         }
@@ -141,7 +155,6 @@ router.get('/',async (req,res)=>{
           await client.connect();
           //convert author name from _id to username of the author
           let data = await courses_c.find({author:new ObjectId(req.session.user._id)}).toArray();
-          let buyRecords = await buyRecords_c.find().toArray();
           if(data.length>=1){
             let courseauthor = await courses_u.findOne({_id:data[0].author})
             if(courseauthor){
@@ -193,7 +206,7 @@ router.get('/',async (req,res)=>{
             await client.connect();
             let data = await courses_c.findOne({name: req.body.name,
             introduction: req.body.introduction,
-            money: req.body.money,
+            money: parseInt(req.body.money),
             content: req.body.content,
             whatPeopleLearn: req.body.whatPeopleLearn,
             videoLink: req.body.videoLink,
@@ -205,7 +218,7 @@ router.get('/',async (req,res)=>{
                 $set: {
             name: req.body.name,
             introduction: req.body.introduction,
-            money: req.body.money,
+            money: parseInt(req.body.money),
             content: req.body.content,
             whatPeopleLearn: req.body.whatPeopleLearn,
             videoLink: req.body.videoLink,
@@ -246,7 +259,7 @@ router.get('/',async (req,res)=>{
         //check if course name is already used
         let data = {name: req.body.name,
             introduction: req.body.introduction,
-            money: req.body.money,
+            money: parseInt(req.body.money),
             content: req.body.content,
             whatPeopleLearn: req.body.whatPeopleLearn,
             author: new ObjectId(req.session.user._id),
@@ -282,17 +295,17 @@ router.get('/',async (req,res)=>{
         //get single course detail by course id
         try {
             await client.connect();
-            let course = await courses_c.findOne({_id:new ObjectId(courseId)});
-            if(courseId.length == 24 && course){
+            let courses = await courses_c.findOne({_id:new ObjectId(courseId)});
+            if(courseId.length == 24 && courses){
                 courseauthor =  await courses_u.findOne({_id:new ObjectId(course.author)}); 
-                course.author = courseauthor.username;
-            if (!course) {
+                courses.author = courseauthor.username;
+            if (!courses) {
                     res.send("無法連接到伺服器，請重新嘗試。")
             } else {
                     let userId = new ObjectId(req.session.user._id);
                     let buyRecords = await buyRecords_c.findOne({courseId:course._id, userId:userId});
-                    if(buyRecords) res.render('courses_detail',{course:course, paid:true, msg:msg});
-                    else res.render('courses_detail',{course:course, paid:false, msg:msg});
+                    if(buyRecords) res.render('courses_detail',{course:courses, paid:true, msg:msg});
+                    else res.render('courses_detail',{course:courses, paid:false, msg:msg});
                   }
                  } else res.redirect('/');
         }finally {
@@ -311,11 +324,6 @@ router.get('/',async (req,res)=>{
             }
             else {
                 let updateRecords = await buyRecords_c.updateOne({$and:[{userId:new ObjectId(req.session.user._id)}, {courseId:new ObjectId(courseId)}]},{$set:{rate:data}});
-                console.log(updateRecords)
-                console.log("userId",new ObjectId(req.session.user._id))
-                console.log("course",courseId)
-                console.log("data",data)
-                console.log("req",req.body.rate)
                 if(updateRecords.modifiedCount > 0) res.redirect(`/courses/${req.params.courseId}?msg=1`);
                 else res.redirect(`/courses/${req.params.courseId}?msg=2`);
             }
