@@ -2,6 +2,12 @@ body {
   padding-left: 50px;
   padding-right: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  
+  background-image: url('../media/river.jpeg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  
 }
 
 a {
@@ -24,7 +30,7 @@ a {
   color: #f1f1f1;
   /* width: 85%; */
   padding: 20px;
-  opacity:0.6;
+  opacity:0.8;
   text-shadow: 1px 1px 1px black;
 }
 
