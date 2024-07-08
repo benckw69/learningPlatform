@@ -15,6 +15,7 @@
         <tr><td colspan="2"><% if (paid) { %><a href="<%= course.videoLink %>" target="_blank"><% } %><img src="<%= course.photoLink %>" height="200" width="200"><% if (paid) { %></a><% } %></td></tr>
         <tr><td>課程名稱</td><td><%= course.name %></td> </li>
         <tr><td>作者</td><td><%= course.author %></td></tr>
+        <tr><td>作者介紹</td><td><%= course.authorDetails %></td></tr>
         <tr><td>學習的人能夠得到甚麼</td><td><%= course.whatPeopleLearn %></td></tr>
         <tr><td>簡介</td><td><%= course.introduction %></td>
         <% if (paid) { %>

@@ -10,6 +10,7 @@ const auth = require('./auth');
 
 const courses_c = client.db(db).collection("courses");
 const courses_u = client.db(db).collection("users");
+const users_c = client.db(db).collection('users');
 const buyRecords_c = client.db(db).collection("buyRecords");
 
 const isValidUrl = urlString=> {
@@ -74,8 +75,6 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     }
     
 }).post('/', auth.isloginByStudent,async (req,res)=>{
-    let courses_c = client.db('learningPlatform').collection('courses');
-    let users_c = client.db('learningPlatform').collection('users');
     let {searchMethod} = req.body;
     try {
         await client.connect();
@@ -173,15 +172,14 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     let msg = req.query.msg;
     if(req.query.msg=="1") msg="更改資料成功";
     else if(req.query.msg=="2") msg="更改資料失敗。請重新嘗試";
-    //only course owner can see the page.  Course owner can edit the data, show the form that allow course owner to edit.  Need edit
-    let course, canView=true;
+    //only course owner can see the page.  Course owner can edit the data, show the form that allow course owner to edit.
     try {
         await client.connect();
-        let data = await courses_c.findOne({_id:new ObjectId(courseId)});
-        if (data) {
+        let course = await courses_c.findOne({_id:new ObjectId(courseId)});
+        if (course) {
             res.render("courses_myCourses_edit", {
-            course: data,
-            courseId:req.params._id,msg:msg
+                course: course,
+                msg:msg
             });
         }
     } finally {
@@ -284,6 +282,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             if(courseId.length == 24 && courses){
                 courseauthor =  await courses_u.findOne({_id:new ObjectId(courses.author)}); 
                 courses.author = courseauthor.username;
+                courses.authorDetails = courseauthor.introduction;
             if (!courses) {
                 res.send("無法連接到伺服器，請重新嘗試。")
             } else {

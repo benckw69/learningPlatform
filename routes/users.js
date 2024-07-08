@@ -35,6 +35,7 @@ router.get('/', auth.islogin, async (req, res) => {
   if (user_new.username.length == 0) req.session.messages.push("用戶名稱不能為空");
   if (req.user.type=="teacher" && user_new.introduction.length == 0) req.session.messages.push("用戶介紹不能為空");
   if(req.user.loginMethod=="email" && !bcrypt.compareSync(req.body.password, req.user.password)) req.session.messages.push("輸入的密碼與伺服器不符");
+  console.log(req.session.messages.length)
   if(req.session.messages.length != 0) res.redirect('/users/edit/personalInfo');
   else {
     try{
@@ -43,19 +44,16 @@ router.get('/', auth.islogin, async (req, res) => {
         const email_repeat = await users_c.findOne({email:req.body.email, type:req.user.type, loginMethod:"email"});
         if(email_repeat && email_repeat._id.toString() != req.user._id) req.session.messages.push("錯誤：電郵地址已經存在，請更改其他電郵地址");
       }
-      else{
+      if(req.session.messages.length != 0) res.redirect('/users/edit/personalInfo');
+      else {
         delete user_new._id;
         const result = await users_c.replaceOne({_id:new ObjectId(req.user._id)}, user_new);
         if(result.acknowledged) {
-          const result2 = await users_c.findOne({_id:new ObjectId(req.user._id)});
-          if(result2){
-            req.session.messages.push("更改資料成功");
-          }
-          else req.session.messages.push("出現未知錯誤，請登出以確保沒有問題");
+          req.session.messages.push("更改資料成功");
         }
         else req.session.messages.push("更改資料失敗，請稍後再試");
+        res.redirect('/users/edit/personalInfo');
       }
-      res.redirect('/users/edit/personalInfo');
     } finally{
         await client.close();
     }

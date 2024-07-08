@@ -30,7 +30,7 @@ a {
   color: #f1f1f1;
   /* width: 85%; */
   padding: 20px;
-  opacity:0.8;
+  opacity:0.9;
   text-shadow: 1px 1px 1px black;
 }
 
@@ -66,3 +66,6 @@ a {
   background-color: #111;
 }
 
+a:link { 
+  text-decoration: none; 
+} 
