@@ -173,56 +173,60 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     if(req.query.msg=="1") msg="更改資料成功";
     else if(req.query.msg=="2") msg="更改資料失敗。請重新嘗試";
     //only course owner can see the page.  Course owner can edit the data, show the form that allow course owner to edit.
-    try {
-        await client.connect();
-        let course = await courses_c.findOne({_id:new ObjectId(courseId)});
-        if (course) {
-            res.render("courses_myCourses_edit", {
-                course: course,
-                msg:msg
-            });
+    if(courseId.length == 24){
+        try {
+            await client.connect();
+            let course = await courses_c.findOne({_id:new ObjectId(courseId)});
+            if (course && course.author.toString()==req.user._id.toString()) {
+                res.render("courses_myCourses_edit", {
+                    course: course,
+                    msg:msg
+                });
+            } else res.redirect('/courses/myCourses');
+        } finally {
+            await client.close();
         }
-    } finally {
-        await client.close();
-    }
+    } else res.redirect('/courses/myCourses');
 
 }).post('/myCourses/:courseId', auth.isloginByTeacher, async(req,res)=>{
     const {courseId} = req.params;
         //rendering details of selected course
         //allow the course to be edit by course owner, handle edited content to database
-    try {
-        await client.connect();
-        let data = await courses_c.findOne({name: req.body.name,
-        introduction: req.body.introduction,
-        money: parseInt(req.body.money),
-        content: req.body.content,
-        whatPeopleLearn: req.body.whatPeopleLearn,
-        videoLink: req.body.videoLink,
-        photoLink: req.body.photoLink,
-        category: req.body.category}
-    );
+    if(courseId.length == 24){
+        try {
+            await client.connect();
+            let data = await courses_c.findOne({name: req.body.name,
+                introduction: req.body.introduction,
+                money: parseInt(req.body.money),
+                content: req.body.content,
+                whatPeopleLearn: req.body.whatPeopleLearn,
+                videoLink: req.body.videoLink,
+                photoLink: req.body.photoLink,
+                category: req.body.category}
+            );
 
-    let data1 = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {
-        $set: {
-            name: req.body.name,
-            introduction: req.body.introduction,
-            money: parseInt(req.body.money),
-            content: req.body.content,
-            whatPeopleLearn: req.body.whatPeopleLearn,
-            videoLink: req.body.videoLink,
-            photoLink: req.body.photoLink,
-            category: req.body.category
+            let data1 = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {
+                $set: {
+                    name: req.body.name,
+                    introduction: req.body.introduction,
+                    money: parseInt(req.body.money),
+                    content: req.body.content,
+                    whatPeopleLearn: req.body.whatPeopleLearn,
+                    videoLink: req.body.videoLink,
+                    photoLink: req.body.photoLink,
+                    category: req.body.category
+                }
+            });
+            if (data1.matchedCount == 1) {
+                res.redirect(`/courses/myCourses/${req.params.courseId}?msg=1`);
+            }
+            else { 
+                res.redirect(`/courses/myCourses/${req.params.courseId}?msg=2`);
+            }
+        } finally {
+            await client.close();
         }
-    });
-    if (data1.matchedCount == 1) {
-        res.redirect(`/courses/myCourses/${req.params.courseId}?msg=1`);
-    }
-    else { 
-        res.redirect(`/courses/myCourses/${req.params.courseId}?msg=2`);
-    }
-    } finally {
-        await client.close();
-  }
+    } else res.redirect('/courses/myCourses');
 
 }).get('/newCourse', auth.isloginByTeacher, (req,res)=>{
     let msg="";
@@ -271,35 +275,35 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
   
 }).get('/:courseId', auth.isloginByStudent, async (req, res)=>{
     const {courseId} = req.params;
-    let msg="";
-    if(req.query.msg==1) msg="評分成功";
-    else if(req.query.msg==2) msg="評分失敗";
-    else if(req.query.msg==3) msg="評分錯誤";
+    if(courseId.length == 24){
+        let msg="";
+        if(req.query.msg==1) msg="評分成功";
+        else if(req.query.msg==2) msg="評分失敗";
+        else if(req.query.msg==3) msg="評分錯誤";
         //get single course detail by course id
         try {
             await client.connect();
             let courses = await courses_c.findOne({_id:new ObjectId(courseId)});
-            if(courseId.length == 24 && courses){
+            if(courses){
+                //replace author id with author name and find the introduction of author
                 courseauthor =  await courses_u.findOne({_id:new ObjectId(courses.author)}); 
                 courses.author = courseauthor.username;
                 courses.authorDetails = courseauthor.introduction;
-            if (!courses) {
-                res.send("無法連接到伺服器，請重新嘗試。")
-            } else {
                 let userId = new ObjectId(req.user._id);
                 let courseId = courses._id;
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
-                if(buyRecords) res.render('courses_detail',{course:courses, paid:true, msg:msg});
-                else res.render('courses_detail',{course:courses, paid:false, msg:msg});
-                }
-            } else res.redirect('/');
+                const paid = buyRecords? true:false;
+                res.render('courses_detail',{course:courses, paid:paid, msg:msg});
+                
+            } else res.redirect('/courses');
         }finally {
             await client.close();
         }
-    
+    } else res.redirect('/courses');
     
 }).post('/:courseId', auth.isloginByStudent, async (req, res)=>{
     const {courseId} = req.params;
+    if(courseId.length == 24){
         try {
             await client.connect();
             let data = Number(req.body.rate);
@@ -314,28 +318,29 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         }finally {
             await client.close();
         }
-    
+    } else res.redirect('/courses');
     
 }).get('/:courseId/buy', auth.isloginByStudent, async(req, res)=>{
     const {courseId} = req.params;
-    try {
-        await client.connect();
-        //insert buy record at database. need edit
-        let course = await courses_c.findOne({_id:new ObjectId(courseId)});
-        let user = await courses_u.findOne({_id:req.user._id});
-        if (user.money >= course.money) {
-            let canBuy = true;
-        if (canBuy) {
-            let balance = user.money -= course.money;
-            await buyRecords_c.insertOne({userId:req.user._id, courseId:courseId});
-            await courses_u.updateOne({_id:req.user._id}, {$set: {money: balance}});
-        }
-    }
+    if(courseId.length == 24){
+        try {
+            await client.connect();
+            //insert buy record at database. need edit
+            let course = await courses_c.findOne({_id:new ObjectId(courseId)});
+            let user = await courses_u.findOne({_id:req.user._id});
+            if (user.money >= course.money) {
+                let canBuy = true;
+                if (canBuy) {
+                    let balance = user.money -= course.money;
+                    await buyRecords_c.insertOne({userId:req.user._id, courseId:courseId});
+                    await courses_u.updateOne({_id:req.user._id}, {$set: {money: balance}});
+                }
+            }
             res.render('courses_detail',{course:course});
-    } finally {
-        await client.close();
-    }
-
+        } finally {
+            await client.close();
+        }
+    } else res.redirect('/courses');
 });
 
 module.exports = router;

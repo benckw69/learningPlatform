@@ -14,7 +14,7 @@
             
             <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform">
                 <div class="container">
-                    <h1 id="registerText">課程資料</h1>
+                    <h1 id="registerText">編輯課程資料</h1>
                     <hr>
                     
                     <label for="name"><b>課程名稱</b></label>
@@ -38,8 +38,16 @@
                     <label for="name"><b>課程價錢</b></label>
                     <input type="text" placeholder="輸入價錢" name="money" id="money" value="<%= course.money %>" required>
                 
-                    <label for="name"><b>課程分類</b></label>
-                    <input type="text" placeholder="輸入分類" name="category" id="category" value="<%= course.category %>" required>
+                    <label for="name"><b>課程分類</b></label><br/>
+                    <select name="category" id="category" required>
+                        <option value="programming">程式</option>
+                        <option value="music">音樂</option>
+                        <option value="investment">投資</option>
+                        <option value="language">語言</option>
+                        <option value="art">藝術</option>
+                        <option value="design">設計</option>
+                        <option value="marketing">市場營銷</option>
+                    </select>
                     
                     <hr>
                     
@@ -50,22 +58,8 @@
                 <p><a href="/courses/myCourses">回到上一頁</a></p>
             </form> 
         </div>
+        <script>
+            document.getElementById('category').value = '<%= course.category %>';
+        </script>
     </body>
     </html>
-    <script>
-        const searchParams = new URLSearchParams(window.location.search);
-
-        if(searchParams.get('error') == "true"){
-            document.getElementById('errorTrueText').style.display = "initial";
-        }
-        else if(searchParams.get('error') == "false"){
-            document.getElementById('errorFalseText').style.display = "initial";
-        }
-
-        if(checkLogin.getAttribute("paid") == "true"){
-            document.getElementById('paid').style.display = "initial";
-        } else {
-            document.getElementById('notpaid').style.display = "initial";
-        }
-
-    </script>
