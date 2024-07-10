@@ -3,11 +3,6 @@ body {
   padding-right: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   
-  background-image: url('../media/river.jpeg');
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-  
 }
 
 a {
@@ -20,7 +15,7 @@ a {
   bottom: 0;
   min-width: 100%;
   min-height: 100%;
-  opacity: 0.6
+  opacity: 0.8
 }
 
 /* Add some content at the bottom of the video/page */
@@ -39,7 +34,7 @@ a {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
+  background-color: rgb(124, 242, 28);
 }
 
 .menuitem {

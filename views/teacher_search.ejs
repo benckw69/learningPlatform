@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %> - 查看課程</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/showCourses.css' />
+    <link rel='stylesheet' href='/stylesheets/backgroundImage.css' />
+    <style>
+      #submit{
+        height: 35px;
+        width:75px;
+        background-color: rgb(124, 242, 28);
+        border-style:none;
+        /* line-height: 50px;
+        padding: 24px;
+        border: none;
+        box-sizing: border-box;
+        color: #fff; */
+      }
+      #searchWords{
+        margin-right: 0px;
+      }
+      /* #searchWords:hover{
+        border-style:none;
+      } */
+      .inputFields{
+        border-style:none;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('audio') %>
+    <div class="content">
+      <h1><%= title %></h1>
+      <%- include('header') %>
+      <div id="form">
+        <form action="/searchTeachers" method="post">
+          <select id="searchMethod" name="searchMethod" class="inputFields">
+            <option value="username">用戶名稱</option>
+            <option value="email">電郵地址</option>
+          </select>
+          <input type="text" id="searchWords" name="searchWords" class="inputFields">
+          
+          <input type="submit" value="提交" id="submit" class="inputFields">
+        </form> 
+      </div>
+      <ul id="courses"><% students.forEach(students=> { %>
+        <li><ul class="course">
+          <li style="font-size: 26px;"><%= students.username %></li>
+          <li>電郵地址： <%= students.email %></li>
+        </ul></li>
+        <% }); %></ul>
+    </div>
+
+  <% 
+      function category_chinese(name){
+        if(name=="programming") return "程式";
+        else if(name=="music") return "音樂";
+        else if(name=="investment") return "投資";
+        else if(name=="language") return "語言";
+        else if(name=="art") return "藝術";
+        else if(name=="design") return "設計";
+        else if(name=="marketing") return "市場營銷";
+        return "錯誤";
+      }
+    %>
+    <script>
+      if('<%= search %>'){
+        document.getElementById('searchWords').value = '<%= search.name %>';
+        if('<%= search.method %>'=="email"){
+          document.getElementById('searchMethod').value = "email";
+        }
+      }
+    </script>
+  </body>
+</html>
