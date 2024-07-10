@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
-const MongoClient = require('mongodb').MongoClient;
 const config = require('./config');
-const { ObjectId } = require('mongodb');
+const { ObjectId, MongoClient } = require('mongodb');
 const client = new MongoClient(config.url);
+const users_c = client.db(config.db).collection("users");
+const moneyTickets_c = client.db(config.db).collection("moneyTickets");
 const auth = require('./auth');
 
 /*  */
@@ -22,21 +23,19 @@ router.get('/insert', auth.isloginByStudent, (req, res) => {
 }).post('/insert', auth.isloginByStudent, async(req, res) => {
     
   let code=req.body.ticketNum;
-  let user=req.session.user;
+  let user=req.user;
   try {
     await client.connect();
-    const moneyTickets_c = client.db("learningPlatform").collection("moneyTickets");
     const getMoneyTickets = await moneyTickets_c.findOne({code:code});
     if(getMoneyTickets) {
       //delete the tickets and modify the value of money of user
       const deleteMoneyTickets = await moneyTickets_c.deleteOne({code:code});
       if(deleteMoneyTickets.deletedCount == 1) {
-        const users_c = client.db("learningPlatform").collection("users");
-        const getUser = await users_c.findOne({_id:new ObjectId(user._id)});
+        const getUser = await users_c.findOne({_id:user._id});
         if(getUser) {
           getUser.money =Number(getUser.money) + Number(getMoneyTickets.money);
           delete getUser._id;
-          const addMoneyToUser = await users_c.replaceOne({_id:new ObjectId(user._id)},getUser);
+          const addMoneyToUser = await users_c.replaceOne({_id:user._id},getUser);
           if(addMoneyToUser) res.redirect('/moneyTickets/insert?msg=1');
           else res.redirect('/moneyTickets/insert?msg=6');
         } else res.redirect('/moneyTickets/insert?msg=5');
@@ -55,7 +54,6 @@ router.get('/insert', auth.isloginByStudent, (req, res) => {
   else if(msgCode=="2") msg = "刪除失敗，請稍後再試";
   try{
     await client.connect();
-    const moneyTickets_c = client.db("learningPlatform").collection("moneyTickets");  
     const moneyTickets = await moneyTickets_c.find().toArray();
     res.render('moneyTickets_view', { moneyTickets:moneyTickets, pop:msg });
   } finally {
@@ -78,7 +76,6 @@ router.get('/insert', auth.isloginByStudent, (req, res) => {
   else {
     try {
       await client.connect();
-      const moneyTickets_c = client.db("learningPlatform").collection("moneyTickets");  
       const moneyTicketsExist = await moneyTickets_c.findOne({code:code});
       if(moneyTicketsExist) res.redirect('/moneyTickets/new?msg=2');
       else {
@@ -96,7 +93,6 @@ router.get('/insert', auth.isloginByStudent, (req, res) => {
     let id=req.query.id;
     try {
       await client.connect();
-      const moneyTickets_c = client.db("learningPlatform").collection("moneyTickets");
       const deleteMoneyTickets = await moneyTickets_c.deleteOne({_id:new ObjectId(id)});
       if(deleteMoneyTickets.deletedCount == 1) res.redirect("/moneyTickets/view?msg=1");
       else res.redirect('/moneyTickets/view?msg=2');

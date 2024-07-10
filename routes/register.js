@@ -20,16 +20,16 @@ router.get('/',auth.isNotlogin,(req,res)=>{
   req.session.messages = [];
 
   //check whether two passwords are the same and the length is longer than or equal to 8.
-  if(password != password2 ) req.session.messages.push("註冊失敗：兩個輸入密碼並不一致");
-  if(password.length < 8) req.session.messages.push("註冊失敗：密碼長度未夠8位");
-  if(!validator.validate(email)) req.session.messages.push("註冊失敗：電郵地址格式錯誤");
+  if(password != password2 ) req.session.messages.push("兩次輸入密碼並不一致");
+  if(password.length < 8) req.session.messages.push("密碼長度未夠8位");
+  if(!validator.validate(email)) req.session.messages.push("電郵地址格式錯誤");
   if(!! req.session.messages.length) res.redirect('/register?type='+type);
   else {
     //check whether email exist in the database.
     try {
       await client.connect();
       const userExist = await users_c.findOne({email:email, type:type});
-      if(userExist) req.session.messages.push("註冊失敗：電郵地址已經存在");
+      if(userExist) req.session.messages.push("電郵地址已經存在");
       else {
         //insert data into database
         const saltRounds = 10;
@@ -45,13 +45,13 @@ router.get('/',auth.isNotlogin,(req,res)=>{
           const newUser = await users_c.findOne({email:email, type:type, loginMethod:"email"});
           if(newUser) {req.login(newUser,(err)=>{
             if(err) req.session.messages.push("出現問題，請重試");
+            else res.redirect('/?msg=3');
           })}
-          else req.session.messages.push("註冊失敗：未能尋找新増紀錄，請再嘗試");
+          else req.session.messages.push("未能尋找新増紀錄，請再嘗試");
         }
-        else req.session.messages.push("註冊失敗：未能新増紀錄，請再嘗試");
+        else req.session.messages.push("未能新増紀錄，請再嘗試");
       }
       if(!! req.session.messages.length) res.redirect('/register?type='+type);
-      else res.redirect('/?msg=3');
     } finally {
         await client.close();
     }

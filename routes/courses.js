@@ -126,15 +126,15 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         let buyRecords = await buyRecords_c.find({userId:new ObjectId(req.user._id)}).toArray();
         if(buyRecords){
             for (const i of buyRecords){
-            let boughtcourses = await courses_c.findOne({_id:i.courseId});
-            courses.push(boughtcourses);
-        }
+                let boughtcourses = await courses_c.findOne({_id:i.courseId});
+                courses.push(boughtcourses);
+            }
             for (let i=0;i<courses.length;i++){
-            let courseauthor = await courses_u.findOne({_id:courses[i].author});
-            courses[i].author = courseauthor.username;
+                let courseauthor = await courses_u.findOne({_id:courses[i].author});
+                courses[i].author = courseauthor.username;
             }
             res.render('courses_paid',{courses:courses});
-                    } else {
+        } else {
             res.render('courses_paid',{courses:[], message:"你沒有任何購買紀錄！"});
         }
     } finally{
