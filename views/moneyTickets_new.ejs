@@ -15,7 +15,12 @@
                 <div class="container">
                 <h1>添加使用卷</h1>
                 <label for="email"><b>換領代碼</b></label>
-                <input type="text" name="code" required>
+                <input type="text" name="code" id="code" required>
+                <input type="checkbox" name="randomCode" value="true" id="checkbox" onchange="codebox()">
+                <label for="email"><b>隨機生成字串</b></label><br/>
+        
+
+                
                 <label for="name"><b>面額</b></label>
                 <input type="text" name="money" required>
                 <button type="submit" class="registerbtn" >添加使用卷</button>
@@ -25,13 +30,37 @@
         </div>
     </body>
     <script>
-        const searchParams = new URLSearchParams(window.location.search);
-        
-        if(searchParams.get('error')=="true"){
-            document.getElementById('errorTrueText').style.display = "initial";
-        } 
-        else if(searchParams.get('error')=="false"){
-            document.getElementById('errorFalseText').style.display = "initial";
+        function codebox(){
+            if(document.getElementById('checkbox').checked){
+                document.getElementById('code').readOnly = true;
+                document.getElementById('code').value = generateRandomString();
+            }
+            else document.getElementById('code').readOnly = false;
         }
+  function generateRandomString() {
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var uppercaseChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var lowercaseChar = "abcdefghijklmnopqrstuvwxyz";
+    var numberChar = "0123456789";
+    var randomString = "";
+    //首先从每个字符集中选择一个字符
+    randomString += uppercaseChar.charAt(Math.floor(Math.random() * uppercaseChar.length));
+    randomString += lowercaseChar.charAt(Math.floor(Math.random() * lowercaseChar.length));
+    randomString += numberChar.charAt(Math.floor(Math.random() * numberChar.length));
+    //随机选择其他字符
+    for (var i = 3; i < 10; i++) {
+    var randomIndex = Math.floor(Math.random() * chars.length);
+    randomString += chars.charAt(randomIndex);
+    }
+    //对字符串进行随机排序
+    randomString = randomString.split('').sort(function(){
+      return 0.5-Math.random();
+    }).join('');
+    return randomString;
+   }
+    //测试代码
+    console.log(generateRandomString());   
+
     </script>
+
 </html>
