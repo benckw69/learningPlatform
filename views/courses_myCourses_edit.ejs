@@ -12,7 +12,7 @@
             <h1><%= title %></h1>
             <%- include('header') %>
             
-            <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform">
+            <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform" enctype="multipart/form-data">
                 <div class="container">
                     <h1 id="registerText">編輯課程資料</h1>
                     <hr>
@@ -30,10 +30,10 @@
                     <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required><%= course.whatPeopleLearn %></textarea> <br/>
 
                     <label for="name"><b>圖片連結</b></label>
-                    <input type="text" placeholder="請輸入連結" name="photoLink" id="photoLink" value="<%= course.photoLink %>" required>
+                    <input type="file" accept="image/jpg,image/jpeg,image/png" name="photoLink" id="photoLink" value="<%= course.photoLink %>">
 
                     <label for="name"><b>影片連結</b></label>
-                    <input type="text" placeholder="請輸入連結" name="videoLink" id="videoLink" value="<%= course.videoLink %>" required>
+                    <input type="file" accept="video/*" name="videoLink" id="videoLink" value="<%= course.videoLink %>">
 
                     <label for="name"><b>課程價錢</b></label>
                     <input type="text" placeholder="輸入價錢" name="money" id="money" value="<%= course.money %>" required>
@@ -48,7 +48,6 @@
                         <option value="design">設計</option>
                         <option value="marketing">市場營銷</option>
                     </select>
-                    
                     <hr>
                     
                     <button type="submit" class="registerbtn">更改資料</button>

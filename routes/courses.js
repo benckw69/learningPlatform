@@ -7,6 +7,9 @@ const db = config.db;
 const client = new MongoClient(config.url);
 const ObjectId = require('mongodb').ObjectId;
 const auth = require('./auth');
+const path = require('path');
+const fs = require('fs');
+const {upload} = require('./multer');
 
 const courses_c = client.db(db).collection("courses");
 const courses_u = client.db(db).collection("users");
@@ -188,41 +191,54 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         }
     } else res.redirect('/courses/myCourses');
 
-}).post('/myCourses/:courseId', auth.isloginByTeacher, async(req,res)=>{
+}).post('/myCourses/:courseId', auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
+    {name: 'photoLink', maxCount:1}]), async(req,res)=>{
     const {courseId} = req.params;
         //rendering details of selected course
         //allow the course to be edit by course owner, handle edited content to database
     if(courseId.length == 24){
         try {
             await client.connect();
-            let data = await courses_c.findOne({name: req.body.name,
+            let oldData = await courses_c.findOne({_id:new ObjectId(courseId)});
+                const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set video variable to null if no video is uploaded
+                if (videoLink != null) {
+                    const videoextension = path.extname(videoLink.originalname);
+                let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
+                if (videoLinkPath) {
+                fs.rename(videoLink.path, videoLinkPath, (err) => {
+                    if (err) throw err;
+                  });
+                }
+            }
+            const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
+                if (photoLink != null) {
+                const photoextension = path.extname(photoLink.originalname);
+                let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
+                if (photoLinkPath) {
+                fs.rename(photoLink.path, photoLinkPath, (err) => {
+                    if (err) throw err;
+                  });
+                }
+                }
+
+            newSet =  {
+                name: req.body.name,
                 introduction: req.body.introduction,
                 money: parseInt(req.body.money),
                 content: req.body.content,
                 whatPeopleLearn: req.body.whatPeopleLearn,
-                videoLink: req.body.videoLink,
-                photoLink: req.body.photoLink,
-                category: req.body.category}
-            );
+                category: req.body.category
+            }
+            if(videoLink != null)newSet.video = videoLink;
+            if(photoLink != null)newSet.photo = photoLink;
 
-            let data1 = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {
-                $set: {
-                    name: req.body.name,
-                    introduction: req.body.introduction,
-                    money: parseInt(req.body.money),
-                    content: req.body.content,
-                    whatPeopleLearn: req.body.whatPeopleLearn,
-                    videoLink: req.body.videoLink,
-                    photoLink: req.body.photoLink,
-                    category: req.body.category
-                }
-            });
-            if (data1.matchedCount == 1) {
+            let newData = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {$set:newSet});
+            if (newData.matchedCount == 1) {
                 res.redirect(`/courses/myCourses/${req.params.courseId}?msg=1`);
             }
             else { 
                 res.redirect(`/courses/myCourses/${req.params.courseId}?msg=2`);
-            }
+    }
         } finally {
             await client.close();
         }
