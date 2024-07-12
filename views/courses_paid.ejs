@@ -17,6 +17,9 @@
           <li>作者： <%= course.author %></li>
           <li>簡介： <%= course.introduction %></li>
           <li>評價： <%= course.rate || "沒有評分" %> <%="("+(course.rateCount || 0)+")"%> </li>
+          <% if (course.PendToDelete) {%>
+            <li>此課程將於<%= course.PendToDelete%>下架</li>
+            <% } %>
         </ul></li>
         <% }); %></ul>
     </div>
