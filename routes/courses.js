@@ -104,6 +104,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let courseauthor = await courses_u.findOne({_id:courses[i].author});
                 courses[i].author = courseauthor.username;
             }
+            courses = await searchRating(courses);
             res.render('courses_paid',{courses:courses});
         } else {
             res.render('courses_paid',{courses:[], message:"你沒有任何購買紀錄！"});
