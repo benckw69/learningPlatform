@@ -29,13 +29,13 @@
                     <br><label for="name"><b>學習的人能夠得到甚麼</b></label><br>
                     <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required><%= course.whatPeopleLearn %></textarea> <br/>
 
-                    <label for="name"><b>上傳圖片</b></label>
+                    <br><label for="name"><b>上傳圖片</b></label><br>
                     <input type="file" accept="image/jpg,image/jpeg,image/png" name="photoLink" id="photoLink" value="<%= course.photoLink %>">
 
-                    <label for="name"><b>上傳影片</b></label>
+                    <br><br><label for="name"><b>上傳影片</b></label><br>
                     <input type="file" accept="video/*" name="videoLink" id="videoLink" value="<%= course.videoLink %>">
 
-                    <label for="name"><b>課程價錢</b></label>
+                    <br><br><label for="name"><b>課程價錢</b></label><br>
                     <input type="text" placeholder="輸入價錢" name="money" id="money" value="<%= course.money %>" required>
                 
                     <label for="name"><b>課程分類</b></label><br/>
@@ -49,16 +49,28 @@
                         <option value="marketing">市場營銷</option>
                     </select>
                     <hr>
-                    
                     <button type="submit" class="registerbtn">更改資料</button>
-                </div>
-                
-                <label for="uname"><b><%= msg %></b></label>
-                <p><a href="/courses/myCourses">回到上一頁</a></p>
-            </form> 
+                <button type="button" class="registerbtn" style="background-color: red;" onclick="deleteCourse()">排定刪除課程</button>
+            </div>
+            <p><a href="/courses/myCourses">回到上一頁</a></p>
+          </form>
+        </div>
+            <% if (messages) { %>
+                <section class="messages">
+                  <% messages.forEach(function(message) { %>
+                    <p><b><%= message %></b></p>
+                  <% }); %>
+                </section>
+              <% } %>
         </div>
         <script>
             document.getElementById('category').value = '<%= course.category %>';
+
+            function deleteCourse(){
+        if(confirm("你確定要刪除課程嗎？")){
+          window.location.href='/courses/myCourses/<%= course._id %>/delete';
+        }
+      }
         </script>
     </body>
     </html>
