@@ -16,6 +16,9 @@
           <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
           <li>作者： <%= course.author %></li>
           <li>簡介： <%= course.introduction %></li>
+          <% if (course.PendToDelete) {%>
+            <li>此課程將於<%= course.PendToDelete%>下架</li>
+            <% } %>
         </ul></li>
         <% }); %></ul>
     </div>

@@ -38,7 +38,6 @@ async function searchRating(courses){
         }
         
     }
-    console.log(courses)
     return courses;
 }
 exports.searchRating = searchRating;

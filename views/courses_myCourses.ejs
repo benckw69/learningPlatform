@@ -18,6 +18,9 @@
         <li>作者： <%= course.author %></li>
         <li>價錢： <%= course.money %> </li>
         <li>評價： <%= course.rate || "沒有評分" %> <%="("+(course.rateCount || 0)+")"%> </li>
+        <% if (course.PendToDelete) {%>
+          <li>此課程將於<%= course.PendToDelete%>下架。<button type="button" onclick="undoDeleteCourse('<%= course._id %>')">取消刪除課程？</button></li>
+          <% } %>
       </ul></li>
       <% }); %></ul>
     </div>
@@ -34,4 +37,12 @@
       }
     %>
   </body>
+  ＜<script>
+    function undoDeleteCourse(id){
+      if(confirm("你確定要取消刪除課程嗎？")){
+        window.location.href='/courses/myCourses/'+id+'/undoDelete';
+        console.log(courseId)
+      }
+    }
+  </script>
 </html>
