@@ -5,14 +5,24 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/stylesheets/backgroundImage.css' />
   </head>
+  <%
+    const imagePath = (course.photo)? "../"+extractBackslash(course.photo.destination)+"/"+course._id+"_photo."+extractBackslash(course.photo.mimetype):"\\images\\default.jpg";
+    const videoPath = (course.video)? "../"+extractBackslash(course.video.destination)+"/"+course._id+"_video."+extractBackslash(course.video.mimetype):"\\videos\\default.mp4";
+    function extractBackslash(mimetype){
+      const index = mimetype.indexOf('/');
+      return mimetype.slice(index+1);
+    }
+
+  %>
   <body>
     <%- include('audio') %>
     <div class="content">
       <h1><%= title %></h1>
       <%- include('header') %>
-
       <table>
-        <tr><td colspan="2"><% if (paid) { %><a href="<%= course.videoLink %>" target="_blank"><% } %><img src="<%= course.photoLink %>" height="200" width="200"><% if (paid) { %></a><% } %></td></tr>
+        <tr><td colspan="2">
+          <img src= "<%= imagePath %>" height="300" width="300">
+        </td></tr>
         <tr><td>課程名稱</td><td><%= course.name %></td> </li>
         <tr><td>作者</td><td><%= course.author %></td></tr>
         <tr><td>作者介紹</td><td><%= course.authorDetails %></td></tr>
@@ -20,7 +30,7 @@
         <tr><td>簡介</td><td><%= course.introduction %></td>
         <% if (paid) { %>
           <tr><td>內容</td><td><%= course.content %></td>
-          <tr><td>影片連結</td><td><a href="<%= course.videoLink %>" target="_blank"><%= course.videoLink %></a></td></tr>
+          <tr><td>影片</td><td><video controls><source src="<%= videoPath %>"></video></td></tr>
         <% } %>
         <% if (!paid) { %>
           <tr><td colspan="2"><a href='/courses/<%= course._id %>/buy'>購買課程：$<%= course.money %></a></td></tr>
@@ -28,8 +38,8 @@
         <% if (paid) { %>
           <tr><td colspan="2"><form method="post">
             <label for="rate">評分 (1至5分):</label>
-            <input type="text" id="rating" value="<%= course.data || '2.5'   %>" ><br/>
-            <input type="range" id="rate" name="rate" value="<%= course.data || '2.5'  %>" min="0" max="5" step="0.1" onchange=<%="updateTextInput(this.value);"%>>
+            <input type="text" id="rating" value="<%= rate || '2.5'   %>" ><br/>
+            <input type="range" id="rate" name="rate" value="<%= rate || '2.5'  %>" min="0" max="5" step="0.1" onchange=<%="updateTextInput(this.value);"%>>
             <input type="submit" value="Submit">
           </form></td></tr>
         <% } %>
@@ -39,6 +49,7 @@
     </div>
   </body>
 </html>
+
 
 <script>
   function updateTextInput(val) {

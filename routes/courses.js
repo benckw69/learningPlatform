@@ -10,21 +10,12 @@ const auth = require('./auth');
 const path = require('path');
 const fs = require('fs');
 const {upload} = require('./multer');
+const {searchRating} = require('./searchRating');
 
 const courses_c = client.db(db).collection("courses");
 const courses_u = client.db(db).collection("users");
 const users_c = client.db(db).collection('users');
 const buyRecords_c = client.db(db).collection("buyRecords");
-
-const isValidUrl = urlString=> {
-    var urlPattern = new RegExp('^(https?:\\/\\/)?'+ // validate protocol
-  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // validate domain name
-  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // validate OR ip (v4) address
-  '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // validate port and path
-  '(\\?[;&a-z\\d%_.~+=-]*)?'+ // validate query string
-  '(\\#[-a-z\\d_]*)?$','i'); // validate fragment locator
-return !!urlPattern.test(urlString);
-}
 
 /* GET courses page. */
 //show all courses, pass course object to ejs. Can see the comments
@@ -44,35 +35,9 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         courses[i].rate = 0;
         }
 
-        //define maps for courses rating
-        let ratings=new Map();
-        let courseCount=new Map();
-
         //for courses in database, calculate their related average rating
-        for (let i=0;i<coursematch.length;i++) { //for total course numbers
-            let records = await buyRecords_c.find({courseId:new ObjectId(coursematch[i])}).toArray(); //retrieve all buying records by course id
-
-            //for courses in database, calculate the average, then push the result into ratings
-            for(let j=0;j<records.length;j++){ //for how many buying records do course[i] have
-                if (records[j].rate) {
-                    let thiscourseId = records[j].courseId.toHexString();
-                    if (!ratings.has(thiscourseId)) {
-                        ratings.set(thiscourseId, 0);
-                        courseCount.set(thiscourseId, 0);
-                    }
-                    ratings.set(thiscourseId, ratings.get(thiscourseId) + records[j].rate);
-                    courseCount.set(thiscourseId, courseCount.get(thiscourseId) + 1);
-                    let currentcourseId = coursematch[i].toHexString();
-                if (ratings.has(currentcourseId)) {
-                    let averageRating = ratings.get(currentcourseId) / courseCount.get(currentcourseId);
-                        courses[i].rate = averageRating.toPrecision(2);
-                } else {
-                        courses[i].rate = 0;
-                }
-                    }
-        }
-    }
-        if(courses) res.render('courses_all',{courses:courses, rate:ratings, search:{method:"words",param:""}});
+        courses = await searchRating(courses);
+        if(courses) res.render('courses_all',{courses:courses, search:{method:"words",param:""}});
     } finally {
         await client.close();
     }
@@ -89,6 +54,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let findAuthorName = await users_c.findOne({_id:searchByWords[i].id});
                 searchByWords[i].author = findAuthorName.username;
             }
+            searchByWords = await searchRating(searchByWords);
             res.render('courses_all',{courses:searchByWords, search:{method:"words",param:searchWords}});
         } else if(searchMethod == "category"){
             let {category} = req.body;
@@ -100,6 +66,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let findAuthorName = await users_c.findOne({_id:searchByCategory[i].id});
                 searchByCategory[i].author = findAuthorName.username;
             }
+            searchByCategory = await searchRating(searchByCategory);
             res.render('courses_all',{courses:searchByCategory, search:{method:"category",param:category}});
         } else if(searchMethod == "tutor"){
             let {searchWords} = req.body;
@@ -114,6 +81,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let findAuthorName = await users_c.findOne({_id:searchByAuthorId[i].id});
                 searchByAuthorId[i].author = findAuthorName.username;
             }
+            searchByAuthorId = await searchRating(searchByAuthorId);
             res.render('courses_all',{courses:searchByAuthorId, search:{method:"words",param:searchWords}});
         } 
         else res.redirect('/courses');
@@ -159,6 +127,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             data[i].author = authorname;
             }
         }
+        data = await searchRating(data);
         res.render("courses_myCourses", {
             courses: data
         });
@@ -191,25 +160,25 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         }
     } else res.redirect('/courses/myCourses');
 
+    /* handle updated course content into database */
 }).post('/myCourses/:courseId', auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
     {name: 'photoLink', maxCount:1}]), async(req,res)=>{
     const {courseId} = req.params;
-        //rendering details of selected course
-        //allow the course to be edit by course owner, handle edited content to database
+    //check if the courseId is valid
     if(courseId.length == 24){
         try {
             await client.connect();
-            let oldData = await courses_c.findOne({_id:new ObjectId(courseId)});
-                const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set video variable to null if no video is uploaded
-                if (videoLink != null) {
+                const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set object video to null if no video is uploaded
+                if (videoLink != null) { //setup renaming format if video exists
                     const videoextension = path.extname(videoLink.originalname);
                 let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
-                if (videoLinkPath) {
+                if (videoLinkPath) { //rename video in directory if video exists
                 fs.rename(videoLink.path, videoLinkPath, (err) => {
                     if (err) throw err;
                   });
                 }
             }
+            /* ...photo... */
             const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
                 if (photoLink != null) {
                 const photoextension = path.extname(photoLink.originalname);
@@ -220,7 +189,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                   });
                 }
                 }
-
+            // setup the new data set
+            // if video or photo data exists in database, do not replace it with null
             newSet =  {
                 name: req.body.name,
                 introduction: req.body.introduction,
@@ -231,8 +201,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             }
             if(videoLink != null)newSet.video = videoLink;
             if(photoLink != null)newSet.photo = photoLink;
-
             let newData = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {$set:newSet});
+            //check if data is stored in database, else output fail message
             if (newData.matchedCount == 1) {
                 res.redirect(`/courses/myCourses/${req.params.courseId}?msg=1`);
             }
@@ -250,37 +220,59 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     else if(req.query.msg==2) msg="新増課程失敗";
     else if(req.query.msg==3) msg+="課程名稱已被使用\n"
     else if(req.query.msg==4) msg+="課程價錢必須為數字\n"
-    else if(req.query.msg==5) msg+="圖片連結或影片連結不是正確的連結"
     res.render('courses_newCourse',{
         user: req.user,
         msg:msg});
     
     
-}).post('/newCourse', auth.isloginByTeacher, async(req,res)=>{
+}).post('/newCourse', auth.isloginByTeacher, auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
+    {name: 'photoLink', maxCount:1}]), async(req,res)=>{
     //add course to database
         try {
         await client.connect();
-    //check if course name is already used
-    let data = {name: req.body.name,
+
+        const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set object video to null if no video is uploaded
+        if (videoLink != null) { //setup renaming format if video exists
+            const videoextension = path.extname(videoLink.originalname);
+        let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
+        if (videoLinkPath) { //rename video in directory if video exists
+        fs.rename(videoLink.path, videoLinkPath, (err) => {
+            if (err) throw err;
+          });
+        }
+    }
+    /* ...photo... */
+    const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
+        if (photoLink != null) {
+        const photoextension = path.extname(photoLink.originalname);
+        let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
+        if (photoLinkPath) {
+        fs.rename(photoLink.path, photoLinkPath, (err) => {
+            if (err) throw err;
+          });
+        }
+        }
+    // setup the new data set
+    // if no video or photo is uploaded, assign corresponding default file
+    newSet =  {
+        name: req.body.name,
         introduction: req.body.introduction,
         money: parseInt(req.body.money),
         content: req.body.content,
-        whatPeopleLearn: req.body.whatPeopleLearn,
         author: new ObjectId(req.user._id),
-        videoLink: req.body.videoLink,
-        photoLink: req.body.photoLink,
+        whatPeopleLearn: req.body.whatPeopleLearn,
         category: req.body.category
-    };
-    const existingDocument = await courses_c.findOne({ name: req.body.name });
-    if (existingDocument) {
+    }
+
+        //check course name, output an error message if course name is replicated
+    const isexistedCourse = await courses_c.findOne({ name: req.body.name });
+    if (isexistedCourse) {
         res.redirect(`/courses/newCourse?msg=3`);
     } else {
-        if (!isValidUrl(req.body.videoLink) || !isValidUrl(req.body.photoLink)) {
-            res.redirect(`/courses/newCourse?msg=5`);
-        } else if (!Number.isInteger(parseInt(req.body.money))) {
+        if (!Number.isInteger(parseInt(req.body.money))) { //check if money is valid number, else output an error message
         res.redirect(`/courses/newCourse?msg=4`);
-        } else {
-            let insertData = await courses_c.insertOne(data);
+        } else { 
+            let insertData = await courses_c.insertOne(newSet);
             if(insertData.acknowledged) res.redirect(`/courses/newCourse?msg=1`);
             else res.redirect(`/courses/NewCourse?msg=2`);
         } 
@@ -309,7 +301,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let courseId = courses._id;
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
                 const paid = buyRecords? true:false;
-                res.render('courses_detail',{course:courses, paid:paid, msg:msg});
+                const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
+                res.render('courses_detail',{course:courses, paid:paid,rate:rate, msg:msg});
                 
             } else res.redirect('/courses');
         }finally {

@@ -38,23 +38,24 @@
           <li>作者： <%= course.author %></li>
           <li>簡介： <%= course.introduction %></li>
           <li>價錢： <%= course.money %> </li>
-          <li>評價： <%= course.rate %> </li>
+          <li>評價： <%= course.rate || "沒有評分" %> <%="("+(course.rateCount || 0)+")"%> </li>
         </ul></li>
         <% }); %></ul>
     </div>
 
   <% 
-      function category_chinese(name){
-        if(name=="programming") return "程式";
-        else if(name=="music") return "音樂";
-        else if(name=="investment") return "投資";
-        else if(name=="language") return "語言";
-        else if(name=="art") return "藝術";
-        else if(name=="design") return "設計";
-        else if(name=="marketing") return "市場營銷";
-        return "錯誤";
-      }
-    %>
+
+    function category_chinese(name){
+      if(name=="programming") return "程式";
+      else if(name=="music") return "音樂";
+      else if(name=="investment") return "投資";
+      else if(name=="language") return "語言";
+      else if(name=="art") return "藝術";
+      else if(name=="design") return "設計";
+      else if(name=="marketing") return "市場營銷";
+      return "錯誤";
+    }
+  %>
     <script>
       function changeSearch(){
         if(document.getElementById('searchMethod').value=="words" || document.getElementById('searchMethod').value=="tutor"){
