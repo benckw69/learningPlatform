@@ -22,7 +22,6 @@ passport.use(new LocalStrategy(
     try {
       await client.connect();
       let userExist = await users_c.findOne({email:email, type:req.query.type});
-      console.log("userExist",userExist);
       if(!userExist) return done(null, false,{message:"找不到電郵地址，請重新輸入"});
       if(!bcrypt.compareSync(password, userExist.password)) return done(null, false,{message:"密碼不正確，請重新輸入"});
       return done(null, userExist);
@@ -42,7 +41,6 @@ passport.use(new GoogleStrategy({
 async function verify(req, issuer, profile, cb) {
   //firstly, check whether user exist.
   let type = req.session.type;
-  console.log(profile);
   try{
     await client.connect();
     let userExist = await users_c.findOne({loginMethod:"google",googleId:profile.id,type:type});
