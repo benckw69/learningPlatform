@@ -15,14 +15,15 @@
                 <div class="container">
                 <h1>添加使用卷</h1>
                 <label for="email"><b>換領代碼</b></label>
+                <input type="button" name="randomCode" value="隨機生成字串" id="checkbox" onclick="codebox()">
                 <input type="text" name="code" id="code" required>
-                <input type="checkbox" name="randomCode" value="true" id="checkbox" onchange="codebox()">
-                <label for="email"><b>隨機生成字串</b></label><br/>
         
-
-                
                 <label for="name"><b>面額</b></label>
-                <input type="text" name="money" required>
+                <input type="button" value="100" onclick="changeValue(100)">
+                <input type="button" value="200" onclick="changeValue(200)">
+                <input type="button" value="500" onclick="changeValue(500)">
+                <input type="button" value="1000" onclick="changeValue(1000)">
+                <input type="number" name="money" min="0" id="money" onchange="rangeChecks(this.value);" required>
                 <button type="submit" class="registerbtn" >添加使用卷</button>
                 </div>
                 <label for="uname"><b><%= msg %></b></label>
@@ -31,35 +32,45 @@
     </body>
     <script>
         function codebox(){
-            if(document.getElementById('checkbox').checked){
-                document.getElementById('code').readOnly = true;
-                document.getElementById('code').value = generateRandomString();
-            }
-            else document.getElementById('code').readOnly = false;
+            // if(document.getElementById('checkbox').checked){
+            //     document.getElementById('code').readOnly = true;
+            //     document.getElementById('code').value = generateRandomString();
+            // }
+            // else document.getElementById('code').readOnly = false;
+            document.getElementById('code').value = generateRandomString();
         }
-  function generateRandomString() {
-    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    var uppercaseChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    var lowercaseChar = "abcdefghijklmnopqrstuvwxyz";
-    var numberChar = "0123456789";
-    var randomString = "";
-    //首先从每个字符集中选择一个字符
-    randomString += uppercaseChar.charAt(Math.floor(Math.random() * uppercaseChar.length));
-    randomString += lowercaseChar.charAt(Math.floor(Math.random() * lowercaseChar.length));
-    randomString += numberChar.charAt(Math.floor(Math.random() * numberChar.length));
-    //随机选择其他字符
-    for (var i = 3; i < 10; i++) {
-    var randomIndex = Math.floor(Math.random() * chars.length);
-    randomString += chars.charAt(randomIndex);
-    }
-    //对字符串进行随机排序
-    randomString = randomString.split('').sort(function(){
-      return 0.5-Math.random();
-    }).join('');
-    return randomString;
-   }
-    //测试代码
-    console.log(generateRandomString());   
+        function generateRandomString() {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var uppercaseChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            var lowercaseChar = "abcdefghijklmnopqrstuvwxyz";
+            var numberChar = "0123456789";
+            var randomString = "";
+            //首先从每个字符集中选择一个字符
+            randomString += uppercaseChar.charAt(Math.floor(Math.random() * uppercaseChar.length));
+            randomString += lowercaseChar.charAt(Math.floor(Math.random() * lowercaseChar.length));
+            randomString += numberChar.charAt(Math.floor(Math.random() * numberChar.length));
+            //随机选择其他字符
+            for (var i = 3; i < 10; i++) {
+            var randomIndex = Math.floor(Math.random() * chars.length);
+            randomString += chars.charAt(randomIndex);
+            }
+            //对字符串进行随机排序
+            randomString = randomString.split('').sort(function(){
+            return 0.5-Math.random();
+            }).join('');
+            return randomString;
+        }
+        
+        function rangeChecks(val){
+            if(val<0){
+            alert("價錢不能為負數，請重新輸入");
+            document.getElementById('money').value=0; 
+            }
+        }
+
+        function changeValue(val){
+            document.getElementById("money").value=val;
+        }
 
     </script>
 

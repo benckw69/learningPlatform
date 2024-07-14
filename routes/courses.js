@@ -305,10 +305,6 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
 }).get('/:courseId', auth.isloginByStudent, async (req, res)=>{
     const {courseId} = req.params;
     if(courseId.length == 24){
-        let msg="";
-        if(req.query.msg==1) msg="評分成功";
-        else if(req.query.msg==2) msg="評分失敗";
-        else if(req.query.msg==3) msg="評分錯誤";
         //get single course detail by course id
         try {
             await client.connect();
@@ -323,7 +319,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
                 const paid = buyRecords? true:false;
                 const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
-                res.render('courses_detail',{course:courses, paid:paid,rate:rate, msg:msg});
+                res.render('courses_detail',{course:courses, paid:paid,rate:rate});
                 
             } else res.redirect('/courses');
         }finally {
@@ -338,13 +334,14 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             await client.connect();
             let data = Number(req.body.rate);
             if (data >=5.1 || data <=-0.1) {
-                res.redirect(`/courses/${req.params.courseId}?msg=3`);
+                req.session.messages.push("評分錯誤，請重試");
             }
             else {
                 let updateRecords = await buyRecords_c.updateOne({$and:[{userId:new ObjectId(req.user._id)}, {courseId:new ObjectId(courseId)}]},{$set:{rate:data}});
-                if(updateRecords.modifiedCount > 0) res.redirect(`/courses/${req.params.courseId}?msg=1`);
-                else res.redirect(`/courses/${req.params.courseId}?msg=2`);
+                if(updateRecords.matchedCount > 0) req.session.messages.push("評分成功");
+                else req.session.messages.push("評分失敗，請重試");
             }
+            res.redirect(`/courses/${courseId}`);
         }finally {
             await client.close();
         }
@@ -364,6 +361,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                     let balance = user.money -= course.money;
                     await buyRecords_c.insertOne({userId:req.user._id, courseId:courseId});
                     await users_c.updateOne({_id:req.user._id}, {$set: {money: balance}});
+                } else {
+                    req.session.messages.push("帳戶金錢不足，請先充值");
                 }
             }
             res.render('courses_detail',{course:course});
