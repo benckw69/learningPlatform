@@ -73,18 +73,11 @@ router.get('/', auth.islogin, async (req, res) => {
     const saltRounds = 10;
     const salt = bcrypt.genSaltSync(saltRounds);
     const hash = bcrypt.hashSync(req.body.password_new, salt);
-    let user_new = structuredClone(req.user);
-    user_new.password = hash;
-    delete user_new._id;
     try{
       await client.connect();
-      const result = await users_c.replaceOne({_id:new ObjectId(req.user._id)},user_new);
+      const result = await users_c.updateOne({_id:new ObjectId(req.user._id)},{$set:{password:hash}});
       if(result.acknowledged) {
-        const result2 = await users_c.findOne({_id:new ObjectId(req.user._id)});
-        if(result2){
-          req.session.messages.push("更改密碼成功");
-        }
-        else req.session.messages.push("出現未知錯誤，請登出以確保沒有問題");
+        req.session.messages.push("更改密碼成功");
       }
       else req.session.messages.push("更改資料失敗，請稍後再試");
     } finally {

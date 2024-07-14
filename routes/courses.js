@@ -247,7 +247,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         user: req.user,
         msg:msg});
     
-}).post('/newCourse', auth.isloginByTeacher, auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
+}).post('/newCourse', auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
     {name: 'photoLink', maxCount:1}]), async(req,res)=>{
     //add course to database
         try {
@@ -295,7 +295,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         } else { 
             let insertData = await courses_c.insertOne(newSet);
             if(insertData.acknowledged) res.redirect(`/courses/newCourse?msg=1`);
-            else res.redirect(`/courses/NewCourse?msg=2`);
+            else res.redirect(`/courses/newCourse?msg=2`);
         } 
     }
     } finally {
