@@ -15,12 +15,11 @@ router.get('/',auth.isNotlogin,(req,res)=>{
 
 }).post('/',auth.isNotlogin, async (req, res) => {
   let type = req.query.type;
-  let username = req.body.username, email = req.body.email;
-  let password = req.body.password, password2 = req.body.password_repeat; 
-  let referral = new ObjectId(req.body.referral);
+  let {username,email,password,password_repeat,referral} = req.body;
+  referral = new ObjectId(referral);
 
   //check whether two passwords are the same and the length is longer than or equal to 8.
-  if(password != password2 ) req.session.messages.push("兩次輸入密碼並不一致");
+  if(password != password_repeat ) req.session.messages.push("兩次輸入密碼並不一致");
   if(password.length < 8) req.session.messages.push("密碼長度未夠8位");
   if(!validator.validate(email)) req.session.messages.push("電郵地址格式錯誤");
   if(!! req.session.messages.length) res.redirect('/register?type='+type);

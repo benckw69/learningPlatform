@@ -26,14 +26,18 @@
       <p><b style="font-size: 24px;">參與遊戲，有機會獲得代用卷</b></p>
       <%- include('header') %>
     </div>
-  
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity= 
+    "sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" 
+    crossorigin="anonymous">
+    </script>
     <script>
 
-      var myGamePiece;
-      var myObstacles = [];
-      var mySound;
-      var myMusic;
-      var myScore;
+      let myGamePiece;
+      let myObstacles = [];
+      let mySound;
+      let myMusic;
+      let myScore;
       
       
       function startGame() {
@@ -41,10 +45,10 @@
         //myGamePiece = new component(30, 30, "green", 10, 120);
         myGamePiece = new image(120,80,10,120,"media/cat.jpg")
         myScore = new component("30px", "Consolas", "green", 280, 40, "text");
-          mySound = new sound("media/貓咪喵喵叫可愛音效.mp3");
-          myMusic = new sound("media/學貓叫.mp3");
-          myMusic.play();
-          myGameArea.start();
+        mySound = new sound("media/貓咪喵喵叫可愛音效.mp3");
+        myMusic = new sound("media/學貓叫.mp3");
+        myMusic.play();
+        myGameArea.start();
       }
       
       var myGameArea = {
@@ -161,18 +165,29 @@
           var x, height, gap, minHeight, maxHeight, minGap, maxGap;
           for (i = 0; i < myObstacles.length; i += 1) {
               if (myGamePiece.crashWith(myObstacles[i])) {
-                   mySound.play();
-                   myMusic.stop();
-                  myGameArea.stop();
-                  
-                  if( myGameArea.frameNo>3000) alert("恭喜！你已獲得3000分。")
-                  else alert("加油！請再接再勵。")
-                  return;
+                    mySound.play();
+                    myMusic.stop();
+                    myGameArea.stop();
+                    const month = new Date().getMonth()<9?  "0"+(new Date().getMonth()+1): new Date().getMonth()
+                    const yearMonthString = ""+new Date().getFullYear()+month;
+                    $.post("/game/request", 
+                        { 
+                            userId: '<%= user._id %>', 
+                            score: myGameArea.frameNo+1,
+                            date: yearMonthString
+                        }, 
+                        (data, status)=> { 
+                            if(data.tickets) alert("恭喜！你已獲得超過 "+data.thresholdScore+" 分，可獲得現金。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
+                            else if(data.newScore) alert("你破了新紀錄！你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。");
+                            else alert("加油！請再接再勵。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
+                            return;
+                        }); 
+                    
               } 
           }
           myGameArea.clear();
           myGameArea.frameNo += 1;
-          console.log(myGameArea.frameNo)
+          //console.log(myGameArea.frameNo)
           
           if (myGameArea.frameNo == 1 || everyinterval(250)) {
               x = myGameArea.canvas.width;
