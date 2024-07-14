@@ -38,13 +38,12 @@
       let mySound;
       let myMusic;
       let myScore;
-      
+      let myBackground;
       
       function startGame() {
-        //myGamePiece = new component(30, 30, "smiley.gif", 10, 120, "image");
-        //myGamePiece = new component(30, 30, "green", 10, 120);
-        myGamePiece = new image(120,80,10,120,"media/cat.jpg")
+        myGamePiece = new component(120, 80, "media/cat.jpg", 10, 120, "image");
         myScore = new component("30px", "Consolas", "green", 280, 40, "text");
+        myBackground = new component(1000, 500, "media/cat.jpg", 0, 0, "image");
         mySound = new sound("media/貓咪喵喵叫可愛音效.mp3");
         myMusic = new sound("media/學貓叫.mp3");
         myMusic.play();
@@ -54,7 +53,7 @@
       var myGameArea = {
           canvas : document.createElement("canvas"),
           start : function() {
-              this.canvas.width = document.body.offsetWidth-120;
+              this.canvas.width = 1000;
               this.canvas.height = 500;
               this.context = this.canvas.getContext("2d");
               document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -69,48 +68,6 @@
           }
       }
       
-      function image(width, height, x, y, src) {
-          this.src = src;
-          this.width = width;
-          this.height = height;
-          this.speedX = 0;
-          this.speedY = 0;    
-          this.x = x;
-          this.y = y;  
-          
-          
-      
-          this.newPos = function() {
-              this.x += this.speedX;
-              this.y += this.speedY;    
-          }    
-          this.update = function() {
-              ctx = myGameArea.context;
-              //ctx.fillStyle = "blue";
-              //ctx.fillRect(this.x, this.y, this.width, this.height);
-      
-              let img = new Image();
-              img.src = this.src;
-              img.onload = ()=>{
-                  ctx.drawImage(img,this.x,this.y,this.width,this.height)
-              }
-          }
-          this.crashWith = function(otherobj) {
-              var myleft = this.x;
-              var myright = this.x + (this.width);
-              var mytop = this.y;
-              var mybottom = this.y + (this.height);
-              var otherleft = otherobj.x;
-              var otherright = otherobj.x + (otherobj.width);
-              var othertop = otherobj.y;
-              var otherbottom = otherobj.y + (otherobj.height);
-              var crash = true;
-              if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
-                  crash = false;
-              }
-              return crash;
-          }
-      }
       
       function everyinterval(n) {
           if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
@@ -130,12 +87,17 @@
           this.x = x;
           this.y = y;    
           this.update = function() {
-              ctx = myGameArea.context;
-              if (this.type == "text") {
+            ctx = myGameArea.context;
+            if (this.type == "text") {
                 ctx.font = this.width + " " + this.height;
                 ctx.fillStyle = color;
                 ctx.fillText(this.text, this.x, this.y);
-              } else {
+            } else if(this.type == "image"){
+                ctx.drawImage(this.image,
+                    this.x,
+                    this.y,
+                    this.width, this.height);
+            } else {
                 ctx.fillStyle = color;
                 ctx.fillRect(this.x, this.y, this.width, this.height);
           }
@@ -162,31 +124,33 @@
       }
       
       function updateGameArea() {
-          var x, height, gap, minHeight, maxHeight, minGap, maxGap;
-          for (i = 0; i < myObstacles.length; i += 1) {
-              if (myGamePiece.crashWith(myObstacles[i])) {
-                    mySound.play();
-                    myMusic.stop();
-                    myGameArea.stop();
-                    const month = new Date().getMonth()<9?  "0"+(new Date().getMonth()+1): new Date().getMonth()
-                    const yearMonthString = ""+new Date().getFullYear()+month;
-                    $.post("/game/request", 
-                        { 
-                            userId: '<%= user._id %>', 
-                            score: myGameArea.frameNo+1,
-                            date: yearMonthString
-                        }, 
-                        (data, status)=> { 
-                            if(data.tickets) alert("恭喜！你已獲得超過 "+data.thresholdScore+" 分，可獲得現金。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
-                            else if(data.newScore) alert("你破了新紀錄！你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。");
-                            else alert("加油！請再接再勵。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
-                            return;
-                        }); 
+        var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+        for (i = 0; i < myObstacles.length; i += 1) {
+            if (myGamePiece.crashWith(myObstacles[i])) {
+                mySound.play();
+                myMusic.stop();
+                myGameArea.stop();
+                const month = new Date().getMonth()<9?  "0"+(new Date().getMonth()+1): new Date().getMonth()
+                const yearMonthString = ""+new Date().getFullYear()+month;
+                $.post("/game/request", 
+                { 
+                    userId: '<%= user._id %>', 
+                    score: myGameArea.frameNo+1,
+                    date: yearMonthString
+                }, 
+                (data, status)=> { 
+                    if(data.tickets) alert("恭喜！你已獲得超過 "+data.thresholdScore+" 分，可獲得現金。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
+                    else if(data.newScore) alert("你破了新紀錄！你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。");
+                    else alert("加油！請再接再勵。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
+                    return;
+                }); 
                     
-              } 
-          }
-          myGameArea.clear();
-          myGameArea.frameNo += 1;
+            } 
+        }
+        myGameArea.clear();
+        myBackground.newPos();
+        myBackground.update();
+        myGameArea.frameNo += 1;
           //console.log(myGameArea.frameNo)
           
           if (myGameArea.frameNo == 1 || everyinterval(250)) {
