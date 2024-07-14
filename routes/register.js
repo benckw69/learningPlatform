@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const auth = require('./auth');
 const {url,db} = require('./config');
 const client = new MongoClient(url);
@@ -17,7 +17,7 @@ router.get('/',auth.isNotlogin,(req,res)=>{
   let type = req.query.type;
   let username = req.body.username, email = req.body.email;
   let password = req.body.password, password2 = req.body.password_repeat; 
-  req.session.messages = [];
+  let referral = new ObjectId(req.body.referral);
 
   //check whether two passwords are the same and the length is longer than or equal to 8.
   if(password != password2 ) req.session.messages.push("兩次輸入密碼並不一致");
@@ -38,6 +38,12 @@ router.get('/',auth.isNotlogin,(req,res)=>{
         let userData = {type:type, email:req.body.email, username:username, password:hash, loginMethod:"email"};
         if(type == "student" || type == "teacher") userData.money = 0;
         if(type == "teacher") userData.introduction = "";
+        const userExist = await users_c.findOne({_id:referral});
+        if(userExist) {
+          userData.money = 10;
+          const updateReferral = await users_c.updateOne({_id:referral},{$set:{money:userExist.money+10}});
+          if(updateReferral.modifiedCount != 1) req.session.messages.push("不能加入現金，請再嘗試");
+        }
         const user = await users_c.insertOne(userData);
 
         //check whether data are inserted.  Find back the inserted data

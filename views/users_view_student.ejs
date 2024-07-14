@@ -25,6 +25,13 @@
           <label for="username"><b>金錢</b></label>
           <input type="text" value="<%= user.money %>" readonly>
 
+          <label for="username"><b>推薦碼(學生)</b></label>
+          <input type="text" value="http://localhost:8888/register?type=student&ref=<%= user._id %>" readonly>
+
+          
+          <label for="username"><b>推薦碼(老師)</b></label>
+          <input type="text" value="http://localhost:8888/register?type=teacher&ref=<%= user._id %>" readonly>
+
           <button type="button" class="registerbtn" id="editButton" onclick="window.location.href='/users/edit/personalInfo'">編輯個人資料</button>
           <button type="button" class="registerbtn" id="changePw" onclick="window.location.href='/users/edit/password'">更改密碼</button>
           <button type="button" class="registerbtn" style="background-color: red;" id="delete" onclick="deleteUser()">刪除帳戶</button>

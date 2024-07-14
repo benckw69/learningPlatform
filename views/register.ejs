@@ -26,6 +26,10 @@
 
         <p><label for="psw-repeat"><b>重覆輸入密碼</b></label></p>
         <input type="password" placeholder="輸入密碼" name="password_repeat" required>
+        
+        <p><label for="psw-repeat"><b>推薦碼</b></label></p>
+        <input type="text" placeholder="推薦碼" name="referral" id="referral">
+
         <hr>
 
         <button type="submit" class="registerbtn">註冊</button>
@@ -52,6 +56,10 @@
         document.getElementById('loginText').textContent = "老師註冊";
         document.getElementById('form').setAttribute("action", "/register?type=teacher");
         document.getElementById('loginAction').setAttribute('href', "/login?type=teacher");
+      }
+
+      if(searchParams.get('ref')){
+        document.getElementById("referral").value = searchParams.get('ref');
       }
     </script>
   </body>
