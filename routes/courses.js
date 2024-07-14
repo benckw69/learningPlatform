@@ -99,6 +99,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let boughtcourses = await courses_c.findOne({_id:i.courseId});
                 courses.push(boughtcourses);
             }
+            console.log(courses);
             for (let i=0;i<courses.length;i++){
                 let courseauthor = await users_c.findOne({_id:courses[i].author});
                 courses[i].author = courseauthor.username;
@@ -352,20 +353,21 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     if(courseId.length == 24){
         try {
             await client.connect();
-            //insert buy record at database. need edit
+            //insert buy record at database.
             let course = await courses_c.findOne({_id:new ObjectId(courseId)});
             let user = await users_c.findOne({_id:req.user._id});
             if (user.money >= course.money) {
-                let canBuy = true;
-                if (canBuy) {
-                    let balance = user.money -= course.money;
-                    await buyRecords_c.insertOne({userId:req.user._id, courseId:courseId});
-                    await users_c.updateOne({_id:req.user._id}, {$set: {money: balance}});
-                } else {
-                    req.session.messages.push("帳戶金錢不足，請先充值");
-                }
+                let balance = user.money -= course.money;
+                await buyRecords_c.insertOne({userId:req.user._id, courseId:new ObjectId(courseId)});
+                await users_c.updateOne({_id:req.user._id}, {$set: {money: balance}});
+                //find author, add value
+                const author = await users_c.findOne({_id:course.author});
+                await users_c.updateOne({_id:course.author},{$set:{money:author.money+course.money}});
+                req.session.messages.push("成功購買課程");
+            } else {
+                req.session.messages.push("帳戶金錢不足，請先充值");
             }
-            res.render('courses_detail',{course:course});
+            res.redirect(`/courses/${courseId}`);
         } finally {
             await client.close();
         }

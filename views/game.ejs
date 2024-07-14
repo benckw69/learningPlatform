@@ -23,7 +23,7 @@
           <button onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()">右</button><br><br>
           <button onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()">下</button>
       </div>
-      <p><b style="font-size: 24px;">參與遊戲，有機會獲得現金</b></p>
+      <p><b style="font-size: 24px;">參與遊戲，有機會獲得現金（每月重新計算）</b></p>
       <%- include('header') %>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -43,7 +43,7 @@
       function startGame() {
         myGamePiece = new component(120, 80, "media/cat.jpg", 10, 120, "image");
         myScore = new component("30px", "Consolas", "green", 280, 40, "text");
-        myBackground = new component(1000, 500, "media/cat.jpg", 0, 0, "image");
+        myBackground = new component(1000, 500, "media/sky.jpg", 0, 0, "image");
         mySound = new sound("media/貓咪喵喵叫可愛音效.mp3");
         myMusic = new sound("media/學貓叫.mp3");
         myMusic.play();
@@ -151,7 +151,6 @@
         myBackground.newPos();
         myBackground.update();
         myGameArea.frameNo += 1;
-          //console.log(myGameArea.frameNo)
           
           if (myGameArea.frameNo == 1 || everyinterval(250)) {
               x = myGameArea.canvas.width;

@@ -57,7 +57,7 @@
         }
         else if(val<0){
           alert("評分不能為負數，請重新評分");
-          rate = 2.5;
+          rate = -val;
         }
         document.getElementById('rateText').value=rate; 
         document.getElementById('rateRange').value=rate; 
