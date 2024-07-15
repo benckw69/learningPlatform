@@ -280,6 +280,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         if(req.query.msg==1) msg="評分成功";
         else if(req.query.msg==2) msg="評分失敗";
         else if(req.query.msg==3) msg="評分錯誤";
+        else if(req.query.msg==4) msg="購買成功";
+        else if(req.query.msg==5) msg="購買失敗";
         //get single course detail by course id
         try {
             await client.connect();
@@ -328,15 +330,22 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             //insert buy record at database. need edit
             let course = await courses_c.findOne({_id:new ObjectId(courseId)});
             let user = await courses_u.findOne({_id:req.user._id});
+            let userTeacher = await courses_u.findOne({_id:course.author});
+           // console.log(user.money, course.money)
             if (user.money >= course.money) {
                 let canBuy = true;
                 if (canBuy) {
+                    //學生剩餘錢
                     let balance = user.money -= course.money;
-                    await buyRecords_c.insertOne({userId:req.user._id, courseId:courseId});
+                    //老師增加收入後的錢
+                    let balanceTeacher= userTeacher.money += course.money;
+                    await buyRecords_c.insertOne({userId:req.user._id, courseId:new ObjectId(courseId)});
                     await courses_u.updateOne({_id:req.user._id}, {$set: {money: balance}});
+                    await courses_u.updateOne({_id:course.author}, {$set: {money: balanceTeacher}});
+                    res.redirect(`/courses/${courseId}?msg=4`)
                 }
-            }
-            res.render('courses_detail',{course:course});
+            } else{ res.redirect(`/courses/${courseId}?msg=5`)}
+            
         } finally {
             await client.close();
         }
