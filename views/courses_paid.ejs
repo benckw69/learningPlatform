@@ -12,6 +12,7 @@
       <h1><%= title %></h1>
       <%- include('header') %>
       <ul id="courses"><% courses.forEach(course=> { %>
+        <% if (!course.PendToDelete || course.PendToDelete < now) {%>
         <li><ul class="course">
           <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
           <li>作者： <%= course.author %></li>
@@ -21,6 +22,7 @@
             <li>此課程將於<%= course.PendToDelete%>下架</li>
             <% } %>
         </ul></li>
+        <% } %>
         <% }); %></ul>
     </div>
     <% 

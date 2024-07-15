@@ -13,7 +13,7 @@ const {upload} = require('./multer');
 const {searchRating} = require('./searchRating');
 const exp = require('constants');
 
-const now = new Date().toUTCString();
+const now = new Date();
 
 const courses_c = client.db(db).collection("courses");
 const users_c = client.db(db).collection('users');
@@ -254,26 +254,10 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         try {
         await client.connect();
         const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set object video to null if no video is uploaded
-        if (videoLink != null) { //setup renaming format if video exists
-            const videoextension = path.extname(videoLink.originalname);
-        let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
-        if (videoLinkPath) { //rename video in directory if video exists
-        fs.rename(videoLink.path, videoLinkPath, (err) => {
-            if (err) throw err;
-          });
-        }
-    }
+        
     /* ...photo... */
     const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
-        if (photoLink != null) {
-        const photoextension = path.extname(photoLink.originalname);
-        let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
-        if (photoLinkPath) {
-        fs.rename(photoLink.path, photoLinkPath, (err) => {
-            if (err) throw err;
-          });
-        }
-        }
+        
     // setup the new data set
     // if no video or photo is uploaded, assign corresponding default file
     newSet =  {
@@ -283,9 +267,10 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         content: req.body.content,
         author: new ObjectId(req.user._id),
         whatPeopleLearn: req.body.whatPeopleLearn,
+        video: videoLink,
+        photo: photoLink,
         category: req.body.category
     }
-
         //check course name, output an error message if course name is replicated
     const isexistedCourse = await courses_c.findOne({ name: req.body.name });
     if (isexistedCourse) {
@@ -295,7 +280,29 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         res.redirect(`/courses/newCourse?msg=4`);
         } else { 
             let insertData = await courses_c.insertOne(newSet);
-            if(insertData.acknowledged) res.redirect(`/courses/newCourse?msg=1`);
+            if(insertData.acknowledged) {
+                const courseId = insertData.insertedId;
+                if (videoLink != null) { //setup renaming format if video exists
+                    const videoextension = path.extname(videoLink.originalname);
+                let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
+                if (videoLinkPath) { //rename video in directory if video exists
+                fs.rename(videoLink.path, videoLinkPath, (err) => {
+                    if (err) throw err;
+                  });
+                }
+                
+            }
+            if (photoLink != null) {
+                const photoextension = path.extname(photoLink.originalname);
+                let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
+                if (photoLinkPath) {
+                fs.rename(photoLink.path, photoLinkPath, (err) => {
+                    if (err) throw err;
+                  });
+                }
+                }
+            res.redirect(`/courses/newCourse?msg=1`);
+            }
             else res.redirect(`/courses/newCourse?msg=2`);
         } 
     }
@@ -327,7 +334,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
                 const paid = buyRecords? true:false;
                 const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
-                res.render('courses_detail',{course:courses,now, paid:paid,rate:rate});
+                res.render('courses_detail',{course:courses,msg:msg, paid:paid,rate:rate});
                 
             } else res.redirect('/courses');
         }finally {
@@ -341,7 +348,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         try {
             await client.connect();
             let data = Number(req.body.rate);
-            if (data >=5.1 || data <=-0.1) {
+            if (data >5 || data <0) {
                 req.session.messages.push("評分錯誤，請重試");
             }
             else {
