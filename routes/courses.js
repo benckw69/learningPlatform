@@ -324,10 +324,10 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 courses.authorDetails = courseauthor.introduction;
                 let userId = new ObjectId(req.user._id);
                 let courseId = courses._id;
-                let buyRecords = await buyRecords_c.findOne({courseId:courseId,msg:msg, userId:userId});
+                let buyRecords = await buyRecords_c.findOne({courseId:courseId,userId:userId});
                 const paid = buyRecords? true:false;
                 const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
-                res.render('courses_detail',{course:courses,now, paid:paid,rate:rate});
+                res.render('courses_detail',{course:courses,msg:msg, paid:paid,rate:rate});
                 
             } else res.redirect('/courses');
         }finally {
