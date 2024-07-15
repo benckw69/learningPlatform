@@ -33,18 +33,15 @@
         </form> 
       </div>
       <ul id="courses"><% courses.forEach(course=> { %>
-        <% if (!course.PendToDelete || course.PendToDelete > now) {%>
+        <% if (!course.PendToDelete) {%>
         <li><ul class="course">
           <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
           <li>作者： <%= course.author %></li>
           <li>簡介： <%= course.introduction %></li>
           <li>價錢： <%= course.money %> </li>
           <li>評價： <%= course.rate || "沒有評分" %> <%="("+(course.rateCount || 0)+")"%> </li>
-          <% if (course.PendToDelete) {%>
-          <li>此課程將於<%= convertToTime(course.PendToDelete) %>下架</li>
-          <% } %>
-          <% } %>
         </ul></li>
+        <% } %>
         <% }); %></ul>
     </div>
     
@@ -60,12 +57,12 @@
       else if(name=="marketing") return "市場營銷";
       return "錯誤";
     }
+    function convertToTime(time) {
+      let timestring = new Date(time);
+      return timestring.toLocaleString();
+    }
   %>
     <script>
-      function convertToTime(time) {
-        let timestring = time.toLocaleString();
-        return timestring;
-      }
       function changeSearch(){
         if(document.getElementById('searchMethod').value=="words" || document.getElementById('searchMethod').value=="tutor"){
           document.getElementById('searchWords').style.display = 'initial';

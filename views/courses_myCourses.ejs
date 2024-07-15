@@ -37,12 +37,12 @@
       }
 
       function convertToTime(time) {
-        let timestring = time.toLocaleString();
-        return timestring;
+        let timestring = new Date(time);
+        return timestring.toLocaleString();
       }
     %>
   </body>
-  ＜<script>
+  <script>
     function undoDeleteCourse(id){
       if(confirm("你確定要取消刪除課程嗎？")){
         window.location.href='/courses/myCourses/'+id+'/undoDelete';
