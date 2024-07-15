@@ -19,13 +19,13 @@
           <input type="text" placeholder="輸入電郵" name="email" required>
           <br/>
           <label for="psw"><b>密碼</b></label>
-          <input type="password" placeholder="輸入密碼" name="password" required>
+          <input type="password" placeholder="輸入密碼" name="password" minlength="8" required>
       
           <button type="submit" class="registerbtn">登入</button>
           <br/>
           <button type="button" class="registerbtn" id="googleLogin" onclick="window.location.href='/login/google/'">Google 登入</button>
           <br/>
-          <p id="haveAccountText">已經有帳戶?請<a href="/" id="registerAction">註冊</a></p>
+          <p id="haveAccountText">沒有帳戶?請<a href="/" id="registerAction">註冊</a></p>
         </div>
       </form> 
 
@@ -56,7 +56,7 @@
           window.location.href='/login/google/teacher';
         }
       } else if (searchParams.get('type')=="admin"){
-        document.getElementById('loginText').textContent = "管理者登入";
+        document.getElementById('loginText').textContent = "管理員登入";
         document.getElementById('form').setAttribute("action","/login?type=admin");
         document.getElementById('haveAccountText').style.display = "none";
         document.getElementById('googleLogin').style.display = "none";
