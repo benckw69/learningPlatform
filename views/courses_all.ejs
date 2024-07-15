@@ -33,6 +33,7 @@
         </form> 
       </div>
       <ul id="courses"><% courses.forEach(course=> { %>
+        <% if (!course.PendToDelete || course.PendToDelete > now) {%>
         <li><ul class="course">
           <li><a href="/courses/<%= course._id %>" ><%= course.name %> - <%= category_chinese(course.category) %></a></li>
           <li>作者： <%= course.author %></li>
@@ -40,7 +41,8 @@
           <li>價錢： <%= course.money %> </li>
           <li>評價： <%= course.rate || "沒有評分" %> <%="("+(course.rateCount || 0)+")"%> </li>
           <% if (course.PendToDelete) {%>
-          <li>此課程將於<%= course.PendToDelete%>下架</li>
+          <li>此課程將於<%= convertToTime(course.PendToDelete) %>下架</li>
+          <% } %>
           <% } %>
         </ul></li>
         <% }); %></ul>
@@ -60,6 +62,10 @@
     }
   %>
     <script>
+      function convertToTime(time) {
+        let timestring = time.toLocaleString();
+        return timestring;
+      }
       function changeSearch(){
         if(document.getElementById('searchMethod').value=="words" || document.getElementById('searchMethod').value=="tutor"){
           document.getElementById('searchWords').style.display = 'initial';

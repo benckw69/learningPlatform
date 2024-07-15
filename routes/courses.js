@@ -13,6 +13,8 @@ const {upload} = require('./multer');
 const {searchRating} = require('./searchRating');
 const exp = require('constants');
 
+const now = new Date().toUTCString();
+
 const courses_c = client.db(db).collection("courses");
 const users_c = client.db(db).collection('users');
 const buyRecords_c = client.db(db).collection("buyRecords");
@@ -36,7 +38,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
 
         //for courses in database, calculate their related average rating
         courses = await searchRating(courses);
-        if(courses) res.render('courses_all',{courses:courses, search:{method:"words",param:""}});
+        if(courses) res.render('courses_all',{courses:courses,now, search:{method:"words",param:""}});
     } finally {
         await client.close();
     }
@@ -54,7 +56,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 searchByWords[i].author = findAuthorName.username;
             }
             searchByWords = await searchRating(searchByWords);
-            res.render('courses_all',{courses:searchByWords, search:{method:"words",param:searchWords}});
+            res.render('courses_all',{courses:searchByWords,now, search:{method:"words",param:searchWords}});
         } else if(searchMethod == "category"){
             let {category} = req.body;
             let searchByCategory;
@@ -66,7 +68,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 searchByCategory[i].author = findAuthorName.username;
             }
             searchByCategory = await searchRating(searchByCategory);
-            res.render('courses_all',{courses:searchByCategory, search:{method:"category",param:category}});
+            res.render('courses_all',{courses:searchByCategory,now, search:{method:"category",param:category}});
         } else if(searchMethod == "tutor"){
             let {searchWords} = req.body;
             let searchTutor = await users_c.find({username:{$regex:searchWords}, type:"teacher"}).toArray();
@@ -81,7 +83,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 searchByAuthorId[i].author = findAuthorName.username;
             }
             searchByAuthorId = await searchRating(searchByAuthorId);
-            res.render('courses_all',{courses:searchByAuthorId, search:{method:"words",param:searchWords}});
+            res.render('courses_all',{courses:searchByAuthorId,now, search:{method:"words",param:searchWords}});
         } 
         else res.redirect('/courses');
     } finally {
@@ -99,15 +101,14 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let boughtcourses = await courses_c.findOne({_id:i.courseId});
                 courses.push(boughtcourses);
             }
-            console.log(courses);
             for (let i=0;i<courses.length;i++){
                 let courseauthor = await users_c.findOne({_id:courses[i].author});
                 courses[i].author = courseauthor.username;
             }
             courses = await searchRating(courses);
-            res.render('courses_paid',{courses:courses});
+            res.render('courses_paid',{courses:courses,now});
         } else {
-            res.render('courses_paid',{courses:[], message:"你沒有任何購買紀錄！"});
+            res.render('courses_paid',{courses:[],now, message:"你沒有任何購買紀錄！"});
         }
     } finally{
         await client.close();
@@ -129,12 +130,11 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             }
         }
         data = await searchRating(data);
-        console.log(data)
         res.render("courses_myCourses", {
-            courses: data
+            courses: data,now
         });
         } else res.render("courses_myCourses", {
-            courses: []
+            courses: [],now
         });
         
     } finally {
@@ -149,7 +149,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             let course = await courses_c.findOne({_id:new ObjectId(courseId)});
             if (course && course.author.toString()==req.user._id.toString()) {
                 res.render("courses_myCourses_edit", {
-                    course: course
+                    course: course,now
                 });
             } else res.redirect('/courses/myCourses');
         } finally {
@@ -219,18 +219,18 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     } else res.redirect('/courses/myCourses');
 }).get('/myCourses/:courseId/delete', auth.isloginByTeacher,async(req,res)=>{
     const {courseId} = req.params;
-    //only course owner can delete the course
+    //only course owner can delete their own course
         try {
             await client.connect();
             const expirationTime = new Date(Date.now() + 604800000);
-            await courses_c.updateOne({_id:new ObjectId(courseId)},{$set:{PendToDelete:expirationTime.toDateString()+expirationTime.toTimeString()} });
+            await courses_c.updateOne({_id:new ObjectId(courseId)},{$set:{PendToDelete:expirationTime.toUTCString()} });
             res.redirect('/courses/myCourses/');
         } finally {
             await client.close();
         }
 }).get('/myCourses/:courseId/undoDelete', auth.isloginByTeacher,async(req,res)=>{
     const {courseId} = req.params;
-    //only course owner can undo delete
+    //only course owner can undo deletion
         try {
             await client.connect();
             await courses_c.updateMany({_id:new ObjectId(courseId)},{$unset:{PendToDelete:""}});
@@ -327,7 +327,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
                 const paid = buyRecords? true:false;
                 const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
-                res.render('courses_detail',{course:courses, paid:paid,msg:msg,rate:rate});
+                res.render('courses_detail',{course:courses,now, paid:paid,rate:rate});
                 
             } else res.redirect('/courses');
         }finally {
