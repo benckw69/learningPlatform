@@ -306,15 +306,13 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
 }).get('/:courseId', auth.isloginByStudent, async (req, res)=>{
     const {courseId} = req.params;
     if(courseId.length == 24){
-<<<<<<< HEAD
-=======
+
         let msg="";
         if(req.query.msg==1) msg="評分成功";
         else if(req.query.msg==2) msg="評分失敗";
         else if(req.query.msg==3) msg="評分錯誤";
         else if(req.query.msg==4) msg="購買成功";
         else if(req.query.msg==5) msg="購買失敗";
->>>>>>> trees
         //get single course detail by course id
         try {
             await client.connect();
@@ -329,7 +327,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
                 const paid = buyRecords? true:false;
                 const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
-                res.render('courses_detail',{course:courses, paid:paid,rate:rate});
+                res.render('courses_detail',{course:courses, paid:paid,msg:msg,rate:rate});
                 
             } else res.redirect('/courses');
         }finally {
@@ -364,8 +362,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             await client.connect();
             //insert buy record at database.
             let course = await courses_c.findOne({_id:new ObjectId(courseId)});
-            let user = await courses_u.findOne({_id:req.user._id});
-            let userTeacher = await courses_u.findOne({_id:course.author});
+            let user = await users_c.findOne({_id:req.user._id});
+            let userTeacher = await users_c.findOne({_id:course.author});
            // console.log(user.money, course.money)
             if (user.money >= course.money) {
                 let canBuy = true;
@@ -375,8 +373,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                     //老師增加收入後的錢
                     let balanceTeacher= userTeacher.money += course.money;
                     await buyRecords_c.insertOne({userId:req.user._id, courseId:new ObjectId(courseId)});
-                    await courses_u.updateOne({_id:req.user._id}, {$set: {money: balance}});
-                    await courses_u.updateOne({_id:course.author}, {$set: {money: balanceTeacher}});
+                    await users_c.updateOne({_id:req.user._id}, {$set: {money: balance}});
+                    await users_c.updateOne({_id:course.author}, {$set: {money: balanceTeacher}});
                     res.redirect(`/courses/${courseId}?msg=4`)
                 }
             } else{ res.redirect(`/courses/${courseId}?msg=5`)}
