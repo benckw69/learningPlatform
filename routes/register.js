@@ -16,7 +16,8 @@ router.get('/',auth.isNotlogin,(req,res)=>{
 }).post('/',auth.isNotlogin, async (req, res) => {
   let type = req.query.type;
   let {username,email,password,password_repeat,referral} = req.body;
-  referral = new ObjectId(referral);
+  if(referral.length ==24 ) referral = new ObjectId(referral);
+  else referral="";
 
   //check whether two passwords are the same and the length is longer than or equal to 8.
   if(password != password_repeat ) req.session.messages.push("兩次輸入密碼並不一致");
@@ -37,7 +38,7 @@ router.get('/',auth.isNotlogin,(req,res)=>{
         let userData = {type:type, email:req.body.email, username:username, password:hash, loginMethod:"email"};
         if(type == "student" || type == "teacher") userData.money = 0;
         if(type == "teacher") userData.introduction = "";
-        const userExist = await users_c.findOne({_id:referral});
+        let userExist = await users_c.findOne({_id:referral});
         if(userExist) {
           userData.money = 10;
           const updateReferral = await users_c.updateOne({_id:referral},{$set:{money:userExist.money+10}});
