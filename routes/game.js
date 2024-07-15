@@ -25,7 +25,7 @@ router.get('/', auth.isloginByStudent, (req, res)=> {
         if(response) {
             if (Number(score) > response.score) {
                 let returnSet = {newScore:true,thresholdScore:gameSettings.score, oldScore:response.score}
-                const userScore = await gameRecords_c.updateOne({userId:userId},{$set:{score:Number(score)}});
+                const userScore = await gameRecords_c.updateOne({userId:userId,date:date},{$set:{score:Number(score)}});
                 if(response.score<gameSettings.score && Number(score)>=gameSettings.score){
                     const user = await users_c.findOne({_id:userId});
                     if(user){
@@ -36,7 +36,7 @@ router.get('/', auth.isloginByStudent, (req, res)=> {
                 if(userScore.modifiedCount == 1) res.json(returnSet);
                 else res.json({error:true});
             }
-            else {res.json({newScore:false, oldScore:response.score});}
+            else res.json({newScore:false, oldScore:response.score});
         }
         else {
             const insert = await gameRecords_c.insertOne({userId:userId,score:Number(score),date:yearMonthString});
@@ -46,7 +46,7 @@ router.get('/', auth.isloginByStudent, (req, res)=> {
                 if(Number(score)>gameSettings.score){
                     const user = await users_c.findOne({_id:userId});
                     if(user){
-                        await users_c.updateOne({_id:userId},{$set:{money:user.money+Number(gameSettings.money)}})
+                        await users_c.updateOne({_id:userId,date:date},{$set:{money:user.money+Number(gameSettings.money)}})
                         returnSet.tickets = true;
                     } else res.json({error:true});
                 }
