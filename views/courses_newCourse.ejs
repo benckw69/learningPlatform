@@ -32,9 +32,9 @@
                     <input type="file" accept="image/jpg,image/jpeg,image/png" name="photoLink" id="photoLink">
 
                     <br><br><label for="name"><b>上傳影片</b></label><br>
-                    <input type="file" accept="video/*" name="videoLink" id="videoLink" >
+                    <input type="file" accept="video/*" name="videoLink" id="videoLink">
 
-                    <label for="name"><b>課程價錢</b></label><br/>
+                    <br><br><label for="name"><b>課程價錢</b></label><br/>
                     <input type="number" placeholder="輸入價錢" name="money" id="money" required><br/>
                 
                     <label for="name"><b>課程分類</b></label><br>
@@ -47,9 +47,7 @@
                         <option value="design">設計</option>
                         <option value="marketing">市場營銷</option>
                     </select>
-                    
                     <hr>
-                    
                     <button type="submit" class="registerbtn">新增課程</button>
                 </div>
                 <% if (messages) { %>
