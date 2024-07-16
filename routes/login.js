@@ -21,7 +21,7 @@ passport.use(new LocalStrategy(
   ,async (req, email, password, done)=> {
     try {
       await client.connect();
-      let userExist = await users_c.findOne({email:email, type:req.query.type});
+      let userExist = await users_c.findOne({email:email, type:req.query.type, loginMethod:"email"});
       if(!userExist) return done(null, false,{message:"找不到電郵地址，請重新輸入"});
       if(!bcrypt.compareSync(password, userExist.password)) return done(null, false,{message:"密碼不正確，請重新輸入"});
       return done(null, userExist);

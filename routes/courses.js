@@ -167,52 +167,52 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         try {
             await client.connect();
                   //data validations, output corresponding fail message, or update course data
-        const isNameReplicated = await courses_c.findOne({ name: req.body.name });
-        if (isNameReplicated) req.session.messages.push("課程名稱已被使用");
-        if(!Number.isInteger(req.body.money)) req.session.messages.push("課程價錢必須為整數數字");
-        if (!!req.session.messages.length) res.redirect(`/courses/myCourses/${req.params.courseId}`);
-        else { //handle data if passed previous checks
+            const isNameReplicated = await courses_c.findOne({ name: req.body.name });
+            if (isNameReplicated) req.session.messages.push("課程名稱已被使用");
+            if(!Number.isInteger(req.body.money)) req.session.messages.push("課程價錢必須為整數數字");
+            if (!!req.session.messages.length) res.redirect(`/courses/myCourses/${req.params.courseId}`);
+            else { //handle data if passed previous checks
                 const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set object video to null if no video is uploaded
                 if (videoLink != null) { //setup renaming format if video exists
                     const videoextension = path.extname(videoLink.originalname);
-                let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
-                if (videoLinkPath) { //rename video in directory if video exists
-                fs.rename(videoLink.path, videoLinkPath, (err) => {
-                    if (err) throw err;
-                  });
+                    let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
+                    if (videoLinkPath) { //rename video in directory if video exists
+                    fs.rename(videoLink.path, videoLinkPath, (err) => {
+                        if (err) throw err;
+                    });
+                    }
                 }
-            }
-            /* ...photo... */
-            const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
+                /* ...photo... */
+                const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
                 if (photoLink != null) {
-                const photoextension = path.extname(photoLink.originalname);
-                let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
-                if (photoLinkPath) {
-                fs.rename(photoLink.path, photoLinkPath, (err) => {
-                    if (err) throw err;
-                  });
+                    const photoextension = path.extname(photoLink.originalname);
+                    let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
+                    if (photoLinkPath) {
+                        fs.rename(photoLink.path, photoLinkPath, (err) => {
+                            if (err) throw err;
+                        });
+                    }
                 }
+                // setup the new data set
+                // if video or photo data exists in database, do not replace it with null
+                newSet =  {
+                    name: req.body.name,
+                    introduction: req.body.introduction,
+                    money: parseInt(req.body.money),
+                    content: req.body.content,
+                    whatPeopleLearn: req.body.whatPeopleLearn,
+                    category: req.body.category
                 }
-            // setup the new data set
-            // if video or photo data exists in database, do not replace it with null
-            newSet =  {
-                name: req.body.name,
-                introduction: req.body.introduction,
-                money: parseInt(req.body.money),
-                content: req.body.content,
-                whatPeopleLearn: req.body.whatPeopleLearn,
-                category: req.body.category
+                if(videoLink != null)newSet.video = videoLink;
+                if(photoLink != null)newSet.photo = photoLink;
+                let newData = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {$set:newSet});
+                if (newData.matchedCount == 1) {
+                    req.session.messages.push("更改資料成功");
+                } else { //if occur any unexpected error e.g. connection failure
+                    req.session.messages.push("更改資料失敗。請重新嘗試");
+                }       
+                if (!!req.session.messages.length) res.redirect(`/courses/myCourses/${req.params.courseId}`);
             }
-            if(videoLink != null)newSet.video = videoLink;
-            if(photoLink != null)newSet.photo = photoLink;
-            let newData = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {$set:newSet});
-              if (newData.matchedCount == 1) {
-                req.session.messages.push("更改資料成功");
-            } else { //if occur any unexpected error e.g. connection failure
-                req.session.messages.push("更改資料失敗。請重新嘗試");
-    }
-    if (!!req.session.messages.length) res.redirect(`/courses/myCourses/${req.params.courseId}`);
-}
         } finally {
             await client.close();
         }
@@ -251,64 +251,63 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
 }).post('/newCourse', auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
     {name: 'photoLink', maxCount:1}]), async(req,res)=>{
     //add course to database
-        try {
+    try {
         await client.connect();
         const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set object video to null if no video is uploaded
         
-    /* ...photo... */
-    const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
-        
-    // setup the new data set
-    // if no video or photo is uploaded, assign corresponding default file
-    newSet =  {
-        name: req.body.name,
-        introduction: req.body.introduction,
-        money: parseInt(req.body.money),
-        content: req.body.content,
-        author: new ObjectId(req.user._id),
-        whatPeopleLearn: req.body.whatPeopleLearn,
-        video: videoLink,
-        photo: photoLink,
-        category: req.body.category
-    }
+    
+        /* ...photo... */
+        const photoLink = req.files.photoLink ? req.files.photoLink[0]: null;
+            
+        // setup the new data set
+        // if no video or photo is uploaded, assign corresponding default file
+        newSet =  {
+            name: req.body.name,
+            introduction: req.body.introduction,
+            money: parseInt(req.body.money),
+            content: req.body.content,
+            author: req.user._id,
+            whatPeopleLearn: req.body.whatPeopleLearn,
+            category: req.body.category
+        }
+
         //check course name, output an error message if course name is replicated
-    const isexistedCourse = await courses_c.findOne({ name: req.body.name });
-    if (isexistedCourse) {
-        res.redirect(`/courses/newCourse?msg=3`);
-    } else {
-        if (!Number.isInteger(parseInt(req.body.money))) { //check if money is valid number, else output an error message
-        res.redirect(`/courses/newCourse?msg=4`);
-        } else { 
-            let insertData = await courses_c.insertOne(newSet);
-            if(insertData.acknowledged) {
-                const courseId = insertData.insertedId;
-                if (videoLink != null) { //setup renaming format if video exists
-                    const videoextension = path.extname(videoLink.originalname);
-                let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
-                if (videoLinkPath) { //rename video in directory if video exists
-                fs.rename(videoLink.path, videoLinkPath, (err) => {
-                    if (err) throw err;
-                  });
+        const isexistedCourse = await courses_c.findOne({ name: req.body.name });
+        if (isexistedCourse) {
+            res.redirect(`/courses/newCourse?msg=3`);
+        } else {
+            if (!Number.isInteger(parseInt(req.body.money))) { //check if money is valid number, else output an error message
+            res.redirect(`/courses/newCourse?msg=4`);
+            } else { 
+                let insertData = await courses_c.insertOne(newSet);
+                if(insertData.acknowledged) {
+                    const courseId = insertData.insertedId;
+                    if (videoLink != null) { //setup renaming format if video exists
+                        const videoextension = path.extname(videoLink.originalname);
+                        let videoLinkPath = req.files.videoLink ? `./public/videos/${courseId}_video${videoextension}` : null;
+                        if (videoLinkPath) { //rename video in directory if video exists
+                            fs.rename(videoLink.path, videoLinkPath, (err) => {
+                                if (err) throw err;
+                            });
+                        }
+                    }
+                    if (photoLink != null) {
+                        const photoextension = path.extname(photoLink.originalname);
+                        let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
+                        if (photoLinkPath) {
+                            fs.rename(photoLink.path, photoLinkPath, (err) => {
+                                if (err) throw err;
+                            });
+                        }
+                    }
+                    res.redirect(`/courses/newCourse?msg=1`);
                 }
-                
-            }
-            if (photoLink != null) {
-                const photoextension = path.extname(photoLink.originalname);
-                let photoLinkPath = req.files.photoLink ? `./public/images/${courseId}_photo${photoextension}` : null;
-                if (photoLinkPath) {
-                fs.rename(photoLink.path, photoLinkPath, (err) => {
-                    if (err) throw err;
-                  });
-                }
-                }
-            res.redirect(`/courses/newCourse?msg=1`);
-            }
-            else res.redirect(`/courses/newCourse?msg=2`);
-        } 
-    }
+                else res.redirect(`/courses/newCourse?msg=2`);
+            } 
+        }
     } finally {
     await client.close();
-  }
+    }
   
 }).get('/:courseId', auth.isloginByStudent, async (req, res)=>{
     const {courseId} = req.params;
@@ -326,12 +325,12 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             let courses = await courses_c.findOne({_id:new ObjectId(courseId)});
             if(courses){
                 //replace author id with author name and find the introduction of author
-                courseauthor =  await users_c.findOne({_id:new ObjectId(courses.author)}); 
+                courseauthor =  await users_c.findOne({_id:courses.author}); 
                 courses.author = courseauthor.username;
                 courses.authorDetails = courseauthor.introduction;
-                let userId = new ObjectId(req.user._id);
+                let userId = req.user._id;
                 let courseId = courses._id;
-                let buyRecords = await buyRecords_c.findOne({courseId:courseId, userId:userId});
+                let buyRecords = await buyRecords_c.findOne({courseId:courseId,userId:userId});
                 const paid = buyRecords? true:false;
                 const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
                 res.render('courses_detail',{course:courses,msg:msg, paid:paid,rate:rate});
@@ -352,7 +351,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 req.session.messages.push("評分錯誤，請重試");
             }
             else {
-                let updateRecords = await buyRecords_c.updateOne({$and:[{userId:new ObjectId(req.user._id)}, {courseId:new ObjectId(courseId)}]},{$set:{rate:data}});
+                let updateRecords = await buyRecords_c.updateOne({$and:[{userId:req.user._id}, {courseId:new ObjectId(courseId)}]},{$set:{rate:data}});
                 if(updateRecords.matchedCount > 0) req.session.messages.push("評分成功");
                 else req.session.messages.push("評分失敗，請重試");
             }
