@@ -63,7 +63,6 @@ app.use('/moneyTickets',require('./routes/moneyTickets'));
 app.use('/searchTeachers', require('./routes/searchTeachers'))
 app.use('/searchStudents', require('./routes/searchStudents'))
 app.use('/game',require('./routes/game'));
-app.use('/gameTickets',require('./routes/gameTickets'));
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler

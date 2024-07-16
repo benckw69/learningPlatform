@@ -134,14 +134,13 @@
                 const yearMonthString = ""+new Date().getFullYear()+month;
                 $.post("/game/request", 
                 { 
-                    userId: '<%= user._id %>', 
                     score: myGameArea.frameNo+1,
                     date: yearMonthString
                 }, 
                 (data, status)=> { 
-                    if(data.tickets) alert("恭喜！你已獲得超過 "+data.thresholdScore+" 分，可獲得現金。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
-                    else if(data.newScore) alert("你破了新紀錄！你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。");
-                    else alert("加油！請再接再勵。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 。")
+                    if(data.tickets) alert("恭喜！你已獲得超過 "+data.thresholdScore+" 分，可獲得現金。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 分。")
+                    else if(data.newScore) alert("你破了新紀錄！你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 分。");
+                    else alert("加油！請再接再勵。你的分數為 "+myGameArea.frameNo+" 分。\n你的舊分數為 "+data.oldScore+" 分。")
                     return;
                 }); 
                     
