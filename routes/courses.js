@@ -115,8 +115,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     }
 
 }).get('/myCourses', auth.isloginByTeacher, async(req,res)=>{
-    //only teachers can see the page.
-            //first, get course paid, then get course detail
+    //only teachers can visit the page.
     try {
         await client.connect();
         //convert author name from _id to username of the author
