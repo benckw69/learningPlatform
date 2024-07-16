@@ -24,9 +24,8 @@ router.get('/', auth.islogin, async (req, res) => {
     
 }).post('/edit/personalInfo', auth.islogin, async(req, res) => {
   let user_new = structuredClone(req.user);
-  req.session.messages = [];
   
-  user_new.email = req.body.email;
+  if (req.user.loginMethod=="email") user_new.email = req.body.email;
   user_new.username = req.body.username;
   if(req.user.type=="teacher"){
     user_new.introduction = req.body.introduction;
@@ -42,12 +41,12 @@ router.get('/', auth.islogin, async (req, res) => {
       await client.connect();
       if(req.user.loginMethod == "email") {
         const email_repeat = await users_c.findOne({email:req.body.email, type:req.user.type, loginMethod:"email"});
-        if(email_repeat && email_repeat._id.toString() != req.user._id) req.session.messages.push("錯誤：電郵地址已經存在，請更改其他電郵地址");
+        if(email_repeat && email_repeat._id.toString() != req.user._id.toString()) req.session.messages.push("錯誤：電郵地址已經存在，請更改其他電郵地址");
       }
       if(req.session.messages.length != 0) res.redirect('/users/edit/personalInfo');
       else {
         delete user_new._id;
-        const result = await users_c.replaceOne({_id:new ObjectId(req.user._id)}, user_new);
+        const result = await users_c.replaceOne({_id:req.user._id}, user_new);
         if(result.acknowledged) {
           req.session.messages.push("更改資料成功");
         }
@@ -75,7 +74,7 @@ router.get('/', auth.islogin, async (req, res) => {
     const hash = bcrypt.hashSync(req.body.password_new, salt);
     try{
       await client.connect();
-      const result = await users_c.updateOne({_id:new ObjectId(req.user._id)},{$set:{password:hash}});
+      const result = await users_c.updateOne({_id:req.user._id},{$set:{password:hash}});
       if(result.acknowledged) {
         req.session.messages.push("更改密碼成功");
       }
@@ -90,9 +89,9 @@ router.get('/', auth.islogin, async (req, res) => {
   let user = req.user;
   try {
     await client.connect(); 
-    let user_d = await users_c.deleteOne({_id:new ObjectId(user._id)});
+    let user_d = await users_c.deleteOne({_id:user._id});
     if(user_d){
-      let user_d2 = await buyRecords.deleteMany({userId:new ObjectId(user._id)});
+      let user_d2 = await buyRecords.deleteMany({userId:user._id});
       req.logOut((err)=>{
         res.redirect('/?msg=1');
       })

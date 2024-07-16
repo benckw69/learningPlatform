@@ -33,10 +33,8 @@ router.get('/insert', auth.isloginByStudent, (req, res) => {
       if(deleteMoneyTickets.deletedCount == 1) {
         const getUser = await users_c.findOne({_id:user._id});
         if(getUser) {
-          getUser.money =Number(getUser.money) + Number(getMoneyTickets.money);
-          delete getUser._id;
-          const addMoneyToUser = await users_c.replaceOne({_id:user._id},getUser);
-          if(addMoneyToUser) res.redirect('/moneyTickets/insert?msg=1');
+          const addMoneyToUser = await users_c.updateOne({_id:user._id},{$set:{money:getUser.money + getMoneyTickets.money}});
+          if(addMoneyToUser.modifiedCount == 1) res.redirect('/moneyTickets/insert?msg=1');
           else res.redirect('/moneyTickets/insert?msg=6');
         } else res.redirect('/moneyTickets/insert?msg=5');
       } else res.redirect('/moneyTickets/insert?msg=4');
@@ -70,7 +68,7 @@ router.get('/insert', auth.isloginByStudent, (req, res) => {
   res.render('moneyTickets_new', { msg:msg });
   
 }).post('/new', auth.isloginByAdmin, async(req,res)=>{
-  let code = req.body.code, money = req.body.money;
+  let code = req.body.code, money = Number(req.body.money);
   const moneyTickets_new = {code:code, money:money};
   if(code.length==0) res.redirect('/moneyTickets/new?msg=3');
   else {
