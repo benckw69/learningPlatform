@@ -51,16 +51,18 @@
                     <button type="submit" class="registerbtn">更改資料</button>
                 <button type="button" class="registerbtn" style="background-color: red;" onclick="deleteCourse()">排定刪除課程</button>
             </div>
+            <% if (messages) { %>
+              <section class="messages">
+                <% messages.forEach(function(message) { %>
+                  <p><b><%= message %></b></p>
+                <% }); %>
+              </section>
+            <% } %>
             <p><a href="/courses/myCourses">回到上一頁</a></p>
           </form>
+          
         </div>
-            <% if (messages) { %>
-                <section class="messages">
-                  <% messages.forEach(function(message) { %>
-                    <p><b><%= message %></b></p>
-                  <% }); %>
-                </section>
-              <% } %>
+            
         </div>
         <script>
           document.getElementById('category').value = '<%= course.category %>';

@@ -161,15 +161,14 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
 }).post('/myCourses/:courseId', auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
     {name: 'photoLink', maxCount:1}]), async(req,res)=>{
     const {courseId} = req.params;
-    req.session.messages = [];
     //check if the courseId is valid
     if(courseId.length == 24){
         try {
             await client.connect();
                   //data validations, output corresponding fail message, or update course data
             const isNameReplicated = await courses_c.findOne({ name: req.body.name });
-            if (isNameReplicated) req.session.messages.push("課程名稱已被使用");
-            if(!Number.isInteger(req.body.money)) req.session.messages.push("課程價錢必須為整數數字");
+            if (isNameReplicated && isNameReplicated._id.toString() != courseId) req.session.messages.push("課程名稱已被使用");
+            if(!Number.isInteger(Number(req.body.money))) req.session.messages.push("課程價錢必須為整數數字");
             if (!!req.session.messages.length) res.redirect(`/courses/myCourses/${req.params.courseId}`);
             else { //handle data if passed previous checks
                 const videoLink = req.files.videoLink ? req.files.videoLink[0]: null; //set object video to null if no video is uploaded
@@ -223,7 +222,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         try {
             await client.connect();
             const expirationTime = new Date(Date.now() + 604800000);
-            await courses_c.updateOne({_id:new ObjectId(courseId)},{$set:{PendToDelete:expirationTime.toUTCString()} });
+            await courses_c.updateOne({_id:new ObjectId(courseId)},{$set:{PendToDelete:expirationTime} });
             res.redirect('/courses/myCourses/');
         } finally {
             await client.close();
@@ -239,14 +238,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             await client.close();
         }
 }).get('/newCourse', auth.isloginByTeacher, (req,res)=>{
-    let msg="";
-    if(req.query.msg==1) msg="新増課程成功";
-    else if(req.query.msg==2) msg="新増課程失敗";
-    else if(req.query.msg==3) msg+="課程名稱已被使用\n"
-    else if(req.query.msg==4) msg+="課程價錢必須為數字\n"
     res.render('courses_newCourse',{
-        user: req.user,
-        msg:msg});
+        user: req.user});
     
 }).post('/newCourse', auth.isloginByTeacher, upload.fields([{name: 'videoLink', maxCount:1},
     {name: 'photoLink', maxCount:1}]), async(req,res)=>{
@@ -272,13 +265,11 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         }
 
         //check course name, output an error message if course name is replicated
-        const isexistedCourse = await courses_c.findOne({ name: req.body.name });
-        if (isexistedCourse) {
-            res.redirect(`/courses/newCourse?msg=3`);
-        } else {
-            if (!Number.isInteger(parseInt(req.body.money))) { //check if money is valid number, else output an error message
-            res.redirect(`/courses/newCourse?msg=4`);
-            } else { 
+        const isNameReplicated = await courses_c.findOne({ name: req.body.name });
+        if (isNameReplicated) req.session.messages.push("課程名稱已被使用");
+        if(!Number.isInteger(Number(req.body.money))) req.session.messages.push("課程價錢必須為整數數字");
+        if (!!req.session.messages.length) res.redirect(`/courses/newCourse`);
+        else {
                 let insertData = await courses_c.insertOne(newSet);
                 if(insertData.acknowledged) {
                     const courseId = insertData.insertedId;
@@ -300,11 +291,12 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                             });
                         }
                     }
-                    res.redirect(`/courses/newCourse?msg=1`);
-                }
-                else res.redirect(`/courses/newCourse?msg=2`);
-            } 
-        }
+                    req.session.messages.push("新增課程成功");
+                } else { //if occur any unexpected error e.g. connection failure
+                    req.session.messages.push("新增課程失敗。請重新嘗試");
+                }       
+                if (!!req.session.messages.length) res.redirect(`/courses/newCourse/`);
+            }
     } finally {
     await client.close();
     }
@@ -333,7 +325,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId,userId:userId});
                 const paid = buyRecords? true:false;
                 const rate = paid&&buyRecords.rate?  buyRecords.rate: null;
-                res.render('courses_detail',{course:courses,msg:msg, paid:paid,rate:rate});
+                res.render('courses_detail',{course:courses,now,msg:msg, paid:paid,rate:rate});
                 
             } else res.redirect('/courses');
         }finally {

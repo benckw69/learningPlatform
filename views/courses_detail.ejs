@@ -12,13 +12,21 @@
       const index = mimetype.indexOf('/');
       return mimetype.slice(index+1);
     }
+    function expired(date) {
+      now = new Date();
+      if (date < now) {
+        return true;
+      } return false;
+    }
+    
 
   %>
-  <body>
+  <body onload="redirectExpired('<%= course.PendToDelete %>');">
     <div class="content">
       <h1><%= title %></h1>
       <%- include('header') %>
       <table>
+        <% if(!expired(course.PendToDelete)) { %>
         <tr><td colspan="2">
           <img src= "<%= imagePath %>" height="300" width="300">
         </td></tr>
@@ -30,6 +38,7 @@
         <% if (paid) { %>
           <tr><td>內容</td><td><%= course.content %></td>
           <tr><td>影片</td><td><video controls><source src="<%= videoPath %>"></video></td></tr>
+          <% if (course.PendToDelete) {%><tr><td>簡介</td><td><%= course.PendToDelete %></td> <% } %>
         <% } %>
         <% if (!paid) { %>
           <tr><td colspan="2"><a href='/courses/<%= course._id %>/buy'>購買課程：$<%= course.money %></a></td></tr>
@@ -42,7 +51,7 @@
             <input type="submit" value="提交">
           </form></td></tr>
         <% } %>
-
+        <% } %>
       </table>
       <% if (messages.length != 0) { %>
         <script>alert('<%= messages %>')</script>
@@ -63,7 +72,18 @@
         document.getElementById('rateText').value=rate; 
         document.getElementById('rateRange').value=rate; 
       }
+      function redirectExpired(date) {
+        now = new Date();
+        date = new Date(date)
+        if (date < now) {
+          window.location.replace('/courses');
+        }
+      }
+
+      
+      
     </script>
+
   </body>
 </html>
 
