@@ -17,7 +17,7 @@ exports.isloginByTeacher = (req,res,next)=>{
     else res.redirect('/login?type=teacher');
 }
 exports.isloginByStudentAndTeacher = (req,res,next)=>{
-    if(req.user && req.user.type == "teacher" || req.user.type == "student") next();
+    if(req.user && (req.user.type == "teacher" || req.user.type == "student")) next();
     else if(req.user) res.redirect('/');
     else res.redirect('/login?type=student');
 }
