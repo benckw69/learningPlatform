@@ -31,8 +31,9 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
 
         //for courses in database, convert author names from _id to their related username
         for (let i=0;i<courses.length;i++) {
-        let courseauthor_b = await users_c.findOne({_id:new ObjectId(courseauthor_a[i])}); //get all author data by author id
-        courses[i].author = courseauthor_b.username;
+        let courseauthor_b = await users_c.findOne({_id:courseauthor_a[i]}); //get all author data by author id
+        if(courseauthor_b) courses[i].author = courseauthor_b.username;
+        else courses[i].author = "已刪除帳戶的導師";
         courses[i].rate = 0;
         }
 
@@ -53,7 +54,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             for(let i=0; i<searchByWords.length;i++){
                 searchByWords[i].id = searchByWords[i].author;
                 let findAuthorName = await users_c.findOne({_id:searchByWords[i].id});
-                searchByWords[i].author = findAuthorName.username;
+                if(findAuthorName) searchByWords[i].author = findAuthorName.username;
+                else searchByWords[i].author = "已刪除的作者";
             }
             searchByWords = await searchRating(searchByWords);
             res.render('courses_all',{courses:searchByWords,now, search:{method:"words",param:searchWords}});
@@ -65,7 +67,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             for(let i=0; i<searchByCategory.length;i++){
                 searchByCategory[i].id = searchByCategory[i].author;
                 let findAuthorName = await users_c.findOne({_id:searchByCategory[i].id});
-                searchByCategory[i].author = findAuthorName.username;
+                if(findAuthorName) searchByCategory[i].author = findAuthorName.username;
+                else searchByCategory[i].author = "已刪除的作者";
             }
             searchByCategory = await searchRating(searchByCategory);
             res.render('courses_all',{courses:searchByCategory,now, search:{method:"category",param:category}});
@@ -80,7 +83,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             for(let i=0;i<searchByAuthorId.length;i++){
                 searchByAuthorId[i].id = searchByAuthorId[i].author;
                 let findAuthorName = await users_c.findOne({_id:searchByAuthorId[i].id});
-                searchByAuthorId[i].author = findAuthorName.username;
+                if(findAuthorName) searchByAuthorId[i].author = findAuthorName.username;
+                else searchByAuthorId[i].author = "已刪除的作者";
             }
             searchByAuthorId = await searchRating(searchByAuthorId);
             res.render('courses_all',{courses:searchByAuthorId,now, search:{method:"words",param:searchWords}});
@@ -99,11 +103,13 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
         if(buyRecords){
             for (const i of buyRecords){
                 let boughtcourses = await courses_c.findOne({_id:i.courseId});
-                courses.push(boughtcourses);
+                if(boughtcourses) courses.push(boughtcourses);
             }
             for (let i=0;i<courses.length;i++){
                 let courseauthor = await users_c.findOne({_id:courses[i].author});
-                courses[i].author = courseauthor.username;
+                if(courseauthor) courses[i].author = courseauthor.username;
+                else courses[i].author = "Deleted author"
+                
             }
             courses = await searchRating(courses);
             res.render('courses_paid',{courses:courses,now});
@@ -317,8 +323,14 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             if(courses){
                 //replace author id with author name and find the introduction of author
                 courseauthor =  await users_c.findOne({_id:courses.author}); 
-                courses.author = courseauthor.username;
-                courses.authorDetails = courseauthor.introduction;
+                if(courseauthor) {
+                    courses.author = courseauthor.username;
+                    courses.authorDetails = courseauthor.introduction;
+                }
+                else {
+                    courses.author = "已刪除的作者";
+                    courses.authorDetails = "已刪除的作者";
+                }
                 let userId = req.user._id;
                 let courseId = courses._id;
                 let buyRecords = await buyRecords_c.findOne({courseId:courseId,userId:userId});
