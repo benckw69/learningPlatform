@@ -63,11 +63,10 @@ router.get('/', auth.islogin, async (req, res) => {
   else res.redirect('/users')
 
 }).post('/edit/password', auth.islogin, async (req,res)=>{
-  req.session.messages = [];
   if(req.body.password_new != req.body.password_new2) req.session.messages.push("兩個輸入密碼並不一致，請重新輸入");
   if(req.body.password_new < 8)  req.session.messages.push("密碼長度未夠8位，請重新輸入");
   if(!bcrypt.compareSync(req.body.password_o, req.user.password)) req.session.messages.push("原始密碼錯誤，請重新輸入");
-  if(req.session.messages) res.redirect('/users/edit/password');
+  if(!! req.session.messages.length) res.redirect('/users/edit/password');
   else {
     const saltRounds = 10;
     const salt = bcrypt.genSaltSync(saltRounds);
@@ -79,6 +78,7 @@ router.get('/', auth.islogin, async (req, res) => {
         req.session.messages.push("更改密碼成功");
       }
       else req.session.messages.push("更改資料失敗，請稍後再試");
+      res.redirect('/users/edit/password');
     } finally {
       await client.close();
     }
@@ -91,7 +91,6 @@ router.get('/', auth.islogin, async (req, res) => {
     await client.connect(); 
     let user_d = await users_c.deleteOne({_id:user._id});
     if(user_d){
-      let user_d2 = await buyRecords.deleteMany({userId:user._id});
       req.logOut((err)=>{
         res.redirect('/?msg=1');
       })
