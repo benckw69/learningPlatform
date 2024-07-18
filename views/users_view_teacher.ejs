@@ -28,11 +28,8 @@
           <label for="username"><b>個人簡介</b></label>
           <input type="text" value="<%= user.introduction %>" readonly>
 
-          <label for="username"><b>推薦碼(學生)</b></label>
-          <input type="text" value="http://localhost:8888/register?type=student&ref=<%= user._id %>" readonly>
-
-          <label for="username"><b>推薦碼(老師)</b></label>
-          <input type="text" value="http://localhost:8888/register?type=teacher&ref=<%= user._id %>" readonly>
+          <label for="username"><b>推薦碼</b></label>
+          <input type="text" value="http://localhost:8888/register?ref=<%= user._id %>" readonly>
         
           <button type="button" class="registerbtn" onclick="window.location.href='/users/edit/personalInfo'">編輯資料</button>
           <button type="button" class="registerbtn" id="changePw" onclick="window.location.href='/users/edit/password'">更改密碼</button>

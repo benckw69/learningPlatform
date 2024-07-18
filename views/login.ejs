@@ -11,9 +11,19 @@
     <div class="content">
       <h1><%= title %></h1>
       <%- include('header') %>
-      <h2 id="loginText">登入</h2>
+      <p style="text-align:left;">
+        <h2 style="display: inline;">登入</h2>
+        <span style="float:right;">
+          <select name="type" id="type" onchange="changeType(this.value)">
+            <option value="student">學生</option>
+            <option value="teacher">老師</option>
+            <option value="admin">管理員</option>
+          </select>
+        </span>
+      </p> 
+      
       <hr>
-      <form id="form" action="/" method="post">
+      <form id="form" action="/login?type=student" method="post">
         <div class="container">    
           <label for="uname"><b>電郵地址</b></label>
           <input type="text" placeholder="輸入電郵" name="email" required>
@@ -23,9 +33,9 @@
       
           <button type="submit" class="registerbtn">登入</button>
           <br/>
-          <button type="button" class="registerbtn" id="googleLogin" onclick="window.location.href='/login/google/'">Google 登入</button>
+          <button type="button" class="registerbtn" style="display: inline;" id="googleLogin" onclick="window.location.href='/login/google/'">Google 登入</button>
           <br/>
-          <p id="haveAccountText">沒有帳戶?請<a href="/" id="registerAction">註冊</a></p>
+          <p id="haveAccountText" style="display: inline;">沒有帳戶?請<a href="/" id="registerAction">註冊</a></p>
         </div>
       </form> 
 
@@ -39,28 +49,29 @@
       
     </div>
     <script>
-      const searchParams = new URLSearchParams(window.location.search);
-
-      if(searchParams.get('type')=="student"){
-        document.getElementById('loginText').textContent = "學生登入";
+      function changeType(type){
+        if(type=="student"){
         document.getElementById('registerAction').setAttribute("href","/register?type=student");
         document.getElementById('form').setAttribute("action","/login?type=student");
+        document.getElementById('googleLogin').style.display = "inline";
+        document.getElementById('haveAccountText').style.display = "inline";
         document.getElementById('googleLogin').onclick = function(){
           window.location.href='/login/google/student';
         }
-      } else if (searchParams.get('type')=="teacher") {
-        document.getElementById('loginText').textContent = "老師登入";
-        document.getElementById('registerAction').setAttribute("href","/register?type=teacher");
-        document.getElementById('form').setAttribute("action","/login?type=teacher");
-        document.getElementById('googleLogin').onclick = function(){
-          window.location.href='/login/google/teacher';
-        }
-      } else if (searchParams.get('type')=="admin"){
-        document.getElementById('loginText').textContent = "管理員登入";
-        document.getElementById('form').setAttribute("action","/login?type=admin");
-        document.getElementById('haveAccountText').style.display = "none";
-        document.getElementById('googleLogin').style.display = "none";
-      } 
+        } else if (type=="teacher") {
+          document.getElementById('registerAction').setAttribute("href","/register?type=teacher");
+          document.getElementById('form').setAttribute("action","/login?type=teacher");
+          document.getElementById('googleLogin').style.display = "inline";
+          document.getElementById('haveAccountText').style.display = "inline";
+          document.getElementById('googleLogin').onclick = function(){
+            window.location.href='/login/google/teacher';
+          }
+        } else if (type=="admin"){
+          document.getElementById('form').setAttribute("action","/login?type=admin");
+          document.getElementById('haveAccountText').style.display = "none";
+          document.getElementById('googleLogin').style.display = "none";
+        } 
+      }
 
     </script>
   </body>

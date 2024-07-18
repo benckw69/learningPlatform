@@ -11,7 +11,15 @@
     <div class="content">
       <h1><%= title %></h1>
       <%- include('header') %>
-      <h2 id="loginText"></h2>
+      <p style="text-align:left;">
+        <h2 style="display: inline;">註冊</h2>
+        <span style="float:right;">
+          <select name="type" id="type" onchange="changeType(this.value)">
+            <option value="student">學生</option>
+            <option value="teacher">老師</option>
+          </select>
+        </span>
+      </p> 
       <hr>
       <form id="form" action="" method="post">
 
@@ -47,17 +55,16 @@
     </div>
     <script>
       const searchParams = new URLSearchParams(window.location.search);
-      if(searchParams.get('type')=="student"){
-        document.getElementById('loginText').textContent = "學生註冊";
+      function changeType(type){
+        if(searchParams.get('type')=="student"){
         document.getElementById('form').setAttribute("action", "/register?type=student");
         document.getElementById('loginAction').setAttribute('href', "/login?type=student");
+        }
+        else {
+          document.getElementById('form').setAttribute("action", "/register?type=teacher");
+          document.getElementById('loginAction').setAttribute('href', "/login?type=teacher");
+        }
       }
-      else {
-        document.getElementById('loginText').textContent = "老師註冊";
-        document.getElementById('form').setAttribute("action", "/register?type=teacher");
-        document.getElementById('loginAction').setAttribute('href', "/login?type=teacher");
-      }
-
       if(searchParams.get('ref')){
         document.getElementById("referral").value = searchParams.get('ref');
       }
