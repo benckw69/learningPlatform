@@ -16,12 +16,18 @@ router.get('/', auth.isloginByStudent, (req, res)=> {
     const userId = req.user._id;
     const score = Number(req.body.score);
     const date = req.body.date;
+    //make a date string that is yyyymm format
     const month = new Date().getMonth()<9?  "0"+(new Date().getMonth()+1): new Date().getMonth()+1;
     const yearMonthString = ""+new Date().getFullYear()+month;
     try{
         await client.connect();
+        //get game settings and the game record of the user on the current month
         const gameSettings = await gameScore_c.findOne();
         const response = await gameRecords_c.findOne({userId:userId,date:date});
+        //if there is game records, it means the personal played before at the current month
+        //if there is better score, insert new records.
+        //if the user break the score in the game setting, the student can gain money for reward
+        //return with json format
         if(response) {
             if (score > response.score) {
                 let returnSet = {newScore:true,thresholdScore:gameSettings.score, oldScore:response.score}
@@ -57,6 +63,7 @@ router.get('/', auth.isloginByStudent, (req, res)=> {
         await client.close();
     }
 }).get('/settings',auth.isloginByAdmin, async (req,res,next)=>{
+    //get game settings and render settings page
     try{
         await client.connect();
         const gameScore = await gameScore_c.findOne();
@@ -66,6 +73,7 @@ router.get('/', auth.isloginByStudent, (req, res)=> {
     }
 
 }).post('/settings',auth.isloginByAdmin, async(req,res)=>{
+    //update new game settings
     const {score,money} = req.body;
     try{
         await client.connect();

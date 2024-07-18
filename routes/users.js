@@ -13,30 +13,37 @@ const auth = require('./auth');
 
 /* GET users listing. */
 router.get('/', auth.islogin, async (req, res) => {
+  //render the page of viewing personal information according to the type of user
   if(req.user.type == "student") res.render('users_view_student');
   else if(req.user.type == "teacher") res.render('users_view_teacher');
   else if(req.user.type == "admin") res.render('users_view_admin');
 
 }).get('/edit/personalInfo', auth.islogin, async (req, res) => {
+  //render the page of editing personal information according to the type of user
   if(req.user.type == "student") res.render('users_edit_student');
   else if(req.user.type == "teacher") res.render('users_edit_teacher');
   else if(req.user.type == "admin") res.render('users_edit_admin');
     
 }).post('/edit/personalInfo', auth.islogin, async(req, res) => {
+  //update new personal information
+
+  //make a new copy of user record
   let user_new = structuredClone(req.user);
-  
+  //get the data back at html form.  Handle it with different types of user and login method of user
   if (req.user.loginMethod=="email") user_new.email = req.body.email;
   user_new.username = req.body.username;
   if(req.user.type=="teacher"){
     user_new.introduction = req.body.introduction;
   }
+  //validation
   if (!validator.validate(user_new.email)) req.session.messages.push("電郵地址格式錯誤");
   if (user_new.username.length == 0) req.session.messages.push("用戶名稱不能為空");
   if (req.user.type=="teacher" && user_new.introduction.length == 0) req.session.messages.push("用戶介紹不能為空");
   if(req.user.loginMethod=="email" && !bcrypt.compareSync(req.body.password, req.user.password)) req.session.messages.push("輸入的密碼與伺服器不符");
-  console.log(req.session.messages.length)
-  if(req.session.messages.length != 0) res.redirect('/users/edit/personalInfo');
+  //redirect to the page if validation fails
+  if(!!req.session.messages.length) res.redirect('/users/edit/personalInfo');
   else {
+    //connect to the database to find whether there are existing email
     try{
       await client.connect();
       if(req.user.loginMethod == "email") {
@@ -45,6 +52,7 @@ router.get('/', auth.islogin, async (req, res) => {
       }
       if(req.session.messages.length != 0) res.redirect('/users/edit/personalInfo');
       else {
+        //update the personal information
         delete user_new._id;
         const result = await users_c.replaceOne({_id:req.user._id}, user_new);
         if(result.acknowledged) {
@@ -59,19 +67,24 @@ router.get('/', auth.islogin, async (req, res) => {
   }
     
 }).get('/edit/password', auth.islogin, (req,res)=>{
+  //render the edit password page only if login method is equal to email
   if(req.user.loginMethod=="email") res.render('users_edit_password');
-  else res.redirect('/users')
+  else res.redirect('/users');
 
 }).post('/edit/password', auth.islogin, async (req,res)=>{
+  //update new password
+  //validation
   if(req.body.password_new != req.body.password_new2) req.session.messages.push("兩個輸入密碼並不一致，請重新輸入");
   if(req.body.password_new < 8)  req.session.messages.push("密碼長度未夠8位，請重新輸入");
   if(!bcrypt.compareSync(req.body.password_o, req.user.password)) req.session.messages.push("原始密碼錯誤，請重新輸入");
   if(!! req.session.messages.length) res.redirect('/users/edit/password');
   else {
+    //encrypt the password
     const saltRounds = 10;
     const salt = bcrypt.genSaltSync(saltRounds);
     const hash = bcrypt.hashSync(req.body.password_new, salt);
     try{
+      //connect to the database and update new hash
       await client.connect();
       const result = await users_c.updateOne({_id:req.user._id},{$set:{password:hash}});
       if(result.acknowledged) {
@@ -85,7 +98,7 @@ router.get('/', auth.islogin, async (req, res) => {
   }
 
 }).get('/delete',auth.isloginByStudentAndTeacher, async (req,res)=>{
-  //delete user data and user paid course data.  Only allow teacher and student type to delete the account.  Need edit.
+  //delete user data, the course should not be shown too
   let user = req.user;
   try {
     await client.connect(); 
