@@ -7,6 +7,7 @@ const client = new MongoClient(url);
 const ObjectId = require('mongodb').ObjectId;
 const users_c = client.db(db).collection("users"); 
 const buyRecords = client.db(db).collection("buyRecords");
+const courses_c = client.db(db).collection("courses");
 const validator = require('email-validator');
 const bcrypt = require('bcrypt');
 const auth = require('./auth');
@@ -89,6 +90,10 @@ router.get('/', auth.islogin, async (req, res) => {
   let user = req.user;
   try {
     await client.connect(); 
+    if (req.user.type == "teacher") {
+        const expirationTime = new Date(Date.now() + 604800000);
+        await courses_c.updateMany({author:new ObjectId(req.user._id)},{$set:{PendToDelete:expirationTime} });
+    }
     let user_d = await users_c.deleteOne({_id:user._id});
     if(user_d){
       req.logOut((err)=>{

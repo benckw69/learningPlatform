@@ -209,7 +209,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 }
                 if(videoLink != null)newSet.video = videoLink;
                 if(photoLink != null)newSet.photo = photoLink;
-                let newData = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {$set:newSet});
+                let newData = await courses_c.updateOne({ _id: new ObjectId(    courseId) }, {$set:newSet});
                 if (newData.matchedCount == 1) {
                     req.session.messages.push("更改資料成功");
                 } else { //if occur any unexpected error e.g. connection failure
@@ -380,10 +380,12 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                     //學生剩餘錢
                     let balance = user.money -= course.money;
                     //老師增加收入後的錢
-                    let balanceTeacher= userTeacher.money += course.money;
+                    if (userTeacher) {
+                        balanceTeacher= userTeacher.money += course.money;
+                    }
                     await buyRecords_c.insertOne({userId:req.user._id, courseId:new ObjectId(courseId)});
                     await users_c.updateOne({_id:req.user._id}, {$set: {money: balance}});
-                    await users_c.updateOne({_id:course.author}, {$set: {money: balanceTeacher}});
+                    if (userTeacher) await users_c.updateOne({_id:course.author}, {$set: {money: balanceTeacher}});
                     res.redirect(`/courses/${courseId}?msg=4`)
                 }
             } else{ res.redirect(`/courses/${courseId}?msg=5`)}
