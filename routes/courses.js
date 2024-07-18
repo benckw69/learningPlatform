@@ -11,7 +11,6 @@ const path = require('path');
 const fs = require('fs');
 const {upload} = require('./multer');
 const {searchRating} = require('./searchRating');
-const exp = require('constants');
 
 const now = new Date();
 
@@ -209,7 +208,7 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 }
                 if(videoLink != null)newSet.video = videoLink;
                 if(photoLink != null)newSet.photo = photoLink;
-                let newData = await courses_c.updateOne({ _id: new ObjectId(    courseId) }, {$set:newSet});
+                let newData = await courses_c.updateOne({ _id: new ObjectId(courseId) }, {$set:newSet});
                 if (newData.matchedCount == 1) {
                     req.session.messages.push("更改資料成功");
                 } else { //if occur any unexpected error e.g. connection failure
@@ -266,6 +265,8 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             content: req.body.content,
             author: req.user._id,
             whatPeopleLearn: req.body.whatPeopleLearn,
+            video: videoLink,
+            photo: photoLink,
             category: req.body.category
         }
 
