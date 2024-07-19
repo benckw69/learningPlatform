@@ -17,9 +17,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage,
     fileFilter: (req, file, cb) => {
       const fileSize = parseInt(req.headers["content-length"])
-        if ((!file.originalname.match(/\.(jpg|jpeg|png)$/) && fileSize <= 8388608) || (!file.mimetype.startsWith("video/") && fileSize <= 5368709120)) {
+        if ((!file.originalname.match(/\.(jpg|jpeg|png)$/) || !file.mimetype.startsWith("video/")) && fileSize <= 5368709120) {
             cb(null, true)
           } else {
+            console.log(fileSize)
           req.session.messages.push("檔案過大")
           cb(null, false)
         }
