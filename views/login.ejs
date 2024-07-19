@@ -33,9 +33,9 @@
       
           <button type="submit" class="registerbtn">登入</button>
           <br/>
-          <button type="button" class="registerbtn" style="display: inline;" id="googleLogin" onclick="window.location.href='/login/google/'">Google 登入</button>
+          <button type="button" class="registerbtn" style="display: inline;" id="googleLogin" onclick="window.location.href='/login/google/student'">Google 登入</button>
           <br/>
-          <p id="haveAccountText" style="display: inline;">沒有帳戶?請<a href="/" id="registerAction">註冊</a></p>
+          <p id="haveAccountText" style="display: inline;">沒有帳戶?請<a href="/register?type=student" id="registerAction">註冊</a></p>
         </div>
       </form> 
 
@@ -72,6 +72,6 @@
           document.getElementById('googleLogin').style.display = "none";
         } 
       }
-
+      changeType("student")
     </script>
   </body>

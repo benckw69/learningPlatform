@@ -58,11 +58,11 @@
       function changeType(type){
         if(searchParams.get('type')=="student"){
         document.getElementById('form').setAttribute("action", "/register?type=student");
-        document.getElementById('loginAction').setAttribute('href', "/login?type=student");
+        document.getElementById('loginAction').setAttribute('href', "/login");
         }
         else {
           document.getElementById('form').setAttribute("action", "/register?type=teacher");
-          document.getElementById('loginAction').setAttribute('href', "/login?type=teacher");
+          document.getElementById('loginAction').setAttribute('href', "/login");
         }
       }
       if(searchParams.get('ref')){
