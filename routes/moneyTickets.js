@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-const config = require('./config');
+require('dotenv').config();
 const { ObjectId, MongoClient } = require('mongodb');
-const client = new MongoClient(config.url);
-const users_c = client.db(config.db).collection("users");
-const moneyTickets_c = client.db(config.db).collection("moneyTickets");
+const client = new MongoClient(process.env['server_url']);
+const server_db = process.env['server_db'];
+const users_c = client.db(server_db).collection("users");
+const moneyTickets_c = client.db(server_db).collection("moneyTickets");
 const auth = require('./auth');
 
 /*  */

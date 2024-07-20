@@ -1,12 +1,14 @@
 var express = require('express');
 var router = express.Router();
+
+require('dotenv').config();
 const auth = require('./auth');
-const {url,db} = require('./config');
-const {ObjectId, MongoClient} = require('mongodb');
+const {MongoClient} = require('mongodb');
+const server_db = process.env['server_db'];
 const client = new MongoClient(url);
-const gameRecords_c = client.db(db).collection("gameRecords");
-const gameScore_c = client.db(db).collection("gameScore");
-const users_c = client.db(db).collection("users");
+const gameRecords_c = client.db(server_db).collection("gameRecords");
+const gameScore_c = client.db(server_db).collection("gameScore");
+const users_c = client.db(server_db).collection("users");
 
 /* GET home page. */
 router.get('/', auth.isloginByStudent, (req, res)=> {

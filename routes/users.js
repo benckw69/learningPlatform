@@ -1,13 +1,13 @@
 var express = require('express');
 var router = express.Router();
 
-const MongoClient = require('mongodb').MongoClient;
-const {url,db} = require('./config');
-const client = new MongoClient(url);
-const ObjectId = require('mongodb').ObjectId;
-const users_c = client.db(db).collection("users"); 
-const buyRecords = client.db(db).collection("buyRecords");
-const courses_c = client.db(db).collection("courses");
+require('dotenv').config();
+const {MongoClient,ObjectId} = require('mongodb');
+const client = new MongoClient(process.env['server_url']);
+const server_db = process.env['server_db'];
+const users_c = client.db(server_db).collection("users"); 
+const buyRecords = client.db(server_db).collection("buyRecords");
+const courses_c = client.db(server_db).collection("courses");
 const validator = require('email-validator');
 const bcrypt = require('bcrypt');
 const auth = require('./auth');

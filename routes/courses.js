@@ -1,11 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-const MongoClient = require('mongodb').MongoClient;
-const config = require('./config');
-const db = config.db;
-const client = new MongoClient(config.url);
-const ObjectId = require('mongodb').ObjectId;
+require('dotenv').config();
+const {MongoClient,ObjectId} = require('mongodb');
+const client = new MongoClient(process.env['server_url']);
+const server_db = process.env['server_db'];
 const auth = require('./auth');
 const path = require('path');
 const fs = require('fs');
@@ -14,9 +13,9 @@ const {searchRating} = require('./searchRating');
 
 const now = new Date();
 
-const courses_c = client.db(db).collection("courses");
-const users_c = client.db(db).collection('users');
-const buyRecords_c = client.db(db).collection("buyRecords");
+const courses_c = client.db(server_db).collection("courses");
+const users_c = client.db(server_db).collection('users');
+const buyRecords_c = client.db(server_db).collection("buyRecords");
 
 /* GET courses page. */
 //show all courses, pass course object to ejs. Can see the comments

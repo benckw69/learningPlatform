@@ -1,10 +1,12 @@
 var express = require('express');
 var router = express.Router();
+
+require('dotenv').config();
 const auth = require('./auth');
-const {db,url} = require('./config');
 const {MongoClient} = require('mongodb');
-const client = new MongoClient(url);
-const users_c = client.db(db).collection("users"); 
+const client = new MongoClient(process.env['server_url']);
+const server_db = process.env['server_db'];
+const users_c = client.db(server_db).collection("users"); 
 
 /* GET home page. */
 router.get('/', auth.isloginByStudent, (req, res)=> {

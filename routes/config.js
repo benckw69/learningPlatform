@@ -1,5 +1,3 @@
-const url = "mongodb+srv://benckw69:Xp8HRCGYad@cluster0.xhaav3r.mongodb.net/";
-const db = "learningPlatform";
 const audioLink = "/media/music.m4a";
 const videoLink = "/media/river.mp4";
 const title = "學無止境";
@@ -22,8 +20,6 @@ const title = "學無止境";
 //     exports.title = result;
 // })
 
-exports.url = url;
-exports.db = db;
 exports.audioLink = audioLink;
 exports.videoLink = videoLink;
 exports.title = title;

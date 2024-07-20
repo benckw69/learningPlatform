@@ -1,16 +1,16 @@
 var express = require('express');
 var router = express.Router();
 
-const MongoClient = require('mongodb').MongoClient;
-const {url,db,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET} = require('./config');
+require('dotenv').config();
+const {MongoClient} = require('mongodb');
 const auth = require('./auth');
-const client = new MongoClient(url);
-const users_c = client.db(db).collection("users");
+const client = new MongoClient(process.env['server_url']);
+const server_db = process.env['server_db'];
+const users_c = client.db(server_db).collection("users");
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const GoogleStrategy = require('passport-google-oidc');
-require('dotenv').config();
 
 passport.use(new LocalStrategy(
   {

@@ -5,10 +5,11 @@ var path = require('path');
 var logger = require('morgan');
 const session = require('express-session');
 const validator = require('email-validator');
-const config = require('./routes/config');
+require('dotenv').config();
 const { MongoClient, ObjectId } = require('mongodb');
-const client = new MongoClient(config.url);
-const users_c = client.db(config.db).collection("users");
+const server_db = process.env['server_db'];
+const client = new MongoClient(process.env['server_url']);
+const users_c = client.db(server_db).collection("users");
 const passport = require('passport');
 
 var indexRouter = require('./routes/index');
