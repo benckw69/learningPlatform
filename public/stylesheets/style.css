@@ -1,7 +1,12 @@
+html {
+  height: 99%;
+}
+
 body {
   padding-left: 50px;
   padding-right: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  height: 100%;
   
 }
 
@@ -20,13 +25,13 @@ a {
 
 /* Add some content at the bottom of the video/page */
 .content {
-  /* position: absolute; */
   background: #98FB98;
   color: #f1f1f1;
-  /* width: 85%; */
   padding: 20px;
   opacity:0.9;
   text-shadow: 1px 1px 1px black;
+  min-height: calc(100% - 8px); 
+  box-sizing: border-box; 
 }
 
 .menubar {

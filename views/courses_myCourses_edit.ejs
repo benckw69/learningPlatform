@@ -5,54 +5,76 @@
         <link rel='stylesheet' href='/stylesheets/style.css' />
         <link rel='stylesheet' href='/stylesheets/userView.css' />
         <link rel='stylesheet' href='/stylesheets/backgroundImage.css' />
+        <style>
+          video {
+            max-width: 500px;
+            max-height: 500px;
+          }
+        </style>
     </head>
     <body>
-        <div class="content">
-            <h1><%= title %></h1>
-            <%- include('header') %>
+      <%
+        const imagePath = (course.photo)? "../../"+extractBackslash(course.photo.destination)+"/"+course._id+"_photo."+extractBackslash(course.photo.mimetype):"../../images/default.jpg";
+        const videoPath = (course.video)? "../../"+extractBackslash(course.video.destination)+"/"+course._id+"_video."+extractBackslash(course.video.mimetype):"../../videos/default.mp4";
+        function extractBackslash(mimetype){
+          const index = mimetype.indexOf('/');
+          return mimetype.slice(index+1);
+        }
+        function expired(date) {
+          const now = new Date();
+          if (date < now) return true;
+          else return false;
+        }
+      %>
+      <div class="content">
+          <h1><%= title %></h1>
+          <%- include('header') %>
+          
+        <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform" enctype="multipart/form-data">
+          <div class="container">
+            <h1 id="registerText">編輯課程資料</h1>
+            <hr>
             
-            <form action="/courses/myCourses/<%= course._id %>" method="post" id="courseform" enctype="multipart/form-data">
-                <div class="container">
-                    <h1 id="registerText">編輯課程資料</h1>
-                    <hr>
-                    
-                    <label for="name"><b>課程名稱</b></label>
-                    <input type="text" placeholder="請輸入名稱" name="name" id="name" value="<%= course.name %>" required>
-                    
-                    <br><label for="name"><b>簡介</b></label><br>
-                    <textarea rows = "5" cols = "60" name = "introduction" form="courseform" required><%= course.introduction %></textarea> <br/>
+            <label for="name"><b>課程名稱</b></label>
+            <input type="text" placeholder="請輸入名稱" name="name" id="name" value="<%= course.name %>" required>
+            
+            <br><label for="name"><b>簡介</b></label><br>
+            <textarea rows = "5" cols = "60" name = "introduction" form="courseform" required><%= course.introduction %></textarea> <br/>
 
-                    <br><label for="name"><b>內容</b></label><br>
-                    <textarea rows = "5" cols = "60" name = "content" form="courseform" required><%= course.content %></textarea> <br/>
+            <br><label for="name"><b>內容</b></label><br>
+            <textarea rows = "5" cols = "60" name = "content" form="courseform" required><%= course.content %></textarea> <br/>
 
-                    <br><label for="name"><b>學習的人能夠得到甚麼</b></label><br>
-                    <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required><%= course.whatPeopleLearn %></textarea><br/>
-                    
-                    <br><br><label for="name"><b>*圖片與影片合共不可超過2GB</b></label><br>
+            <br><label for="name"><b>學習的人能夠得到甚麼</b></label><br>
+            <textarea rows = "5" cols = "60" name = "whatPeopleLearn" form="courseform" required><%= course.whatPeopleLearn %></textarea><br/>
+            
+            <br><br><label for="name"><b>*圖片與影片合共不可超過2GB</b></label><br>
 
-                    <br><br><label for="name"><b>上傳圖片</b></label><br>
-                    <input type="file" accept="image/jpg,image/jpeg,image/png" name="photoLink" id="photoLink" value="<%= course.photoLink %>">
+            <br><br><label for="name"><b>上傳圖片</b></label><br>
+            <input type="file" accept="image/jpg,image/jpeg,image/png" name="photoLink" id="imageUpload">
+            <button type="button" onclick="resetImage()">重設圖片</button><br>
+            <img src="<%= imagePath %>" style="max-width: 500px;max-height: 500px;" id="imagePreview">
 
-                    <br><br><label for="name"><b>上傳影片</b></label><br>
-                    <input type="file" accept="video/*" name="videoLink" id="videoLink" value="<%= course.videoLink %>">
+            <br><br><label for="name"><b>上傳影片</b></label><br>
+            <input type="file" accept="video/*" name="videoLink" id="videoUpload">
+            <button type="button" onclick="resetVideo()">重設影片</button><br>
+            <video controls id="videoPreview" src="<%= videoPath %>"></video>
 
-                    <br><br><label for="name"><b>課程價錢</b></label><br>
-                    <input type="number" placeholder="輸入價錢" name="money" id="money" value="<%= course.money %>" min="0" step="1" onchange="rangeChecks(this.value,this.id);" required>
-                
-                    <label for="name"><b>課程分類</b></label><br/>
-                    <select name="category" id="category" required>
-                        <option value="programming">程式</option>
-                        <option value="music">音樂</option>
-                        <option value="investment">投資</option>
-                        <option value="language">語言</option>
-                        <option value="art">藝術</option>
-                        <option value="design">設計</option>
-                        <option value="marketing">市場營銷</option>
-                    </select>
-                    <hr>
-                    <button type="submit" class="registerbtn">更改資料</button>
-                <button type="button" class="registerbtn" style="background-color: red;" onclick="deleteCourse()">排定刪除課程</button>
-            </div>
+            <br><br><label for="name"><b>課程價錢</b></label><br>
+            <input type="number" placeholder="輸入價錢" name="money" id="money" value="<%= course.money %>" min="0" step="1" onchange="rangeChecks(this.value,this.id);" required>
+        
+            <label for="name"><b>課程分類</b></label><br/>
+            <select name="category" id="category" required>
+                <option value="programming">程式</option>
+                <option value="music">音樂</option>
+                <option value="investment">投資</option>
+                <option value="language">語言</option>
+                <option value="art">藝術</option>
+                <option value="design">設計</option>
+                <option value="marketing">市場營銷</option>
+            </select>
+            <hr>
+            <button type="submit" class="registerbtn">更改資料</button>
+            <button type="button" class="registerbtn" style="background-color: red;" onclick="deleteCourse()">排定刪除課程</button>
             <% if (messages) { %>
               <section class="messages">
                 <% messages.forEach(function(message) { %>
@@ -61,25 +83,51 @@
               </section>
             <% } %>
             <p><a href="/courses/myCourses">回到上一頁</a></p>
-          </form>
-          
-        </div>
-            
-        </div>
-        <script>
-          document.getElementById('category').value = '<%= course.category %>';
+          </div>
+        </form>
+      </div>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+      <script>
+        document.getElementById('category').value = '<%= course.category %>';
 
-          function deleteCourse(){
-            if(confirm("你確定要刪除課程嗎？")){
-              window.location.href='/courses/myCourses/<%= course._id %>/delete';
-            }
+        function deleteCourse(){
+          if(confirm("你確定要刪除課程嗎？")){
+            window.location.href='/courses/myCourses/<%= course._id %>/delete';
           }
-          function rangeChecks(val,id){
-            if(val<0){
-                alert("價錢不能為負數，請重新輸入");
-                document.getElementById(id).value=2.5; 
-            }
+        }
+        function rangeChecks(val,id){
+          if(val<0){
+              alert("價錢不能為負數，請重新輸入");
+              document.getElementById(id).value=2.5; 
           }
-        </script>
+        }
+
+        const imageInput = document.getElementById("imageUpload");
+        const imagePreview = document.getElementById('imagePreview');
+        function resetImage(){
+          imageInput.value=null;
+          $("#imagePreview").attr('src', '<%= imagePath %>');
+        }
+        $ ("#imageUpload").change(()=> {
+          const file = imageInput.files;
+          if(imageInput.files){
+            const fileUrl = window.URL.createObjectURL(imageInput.files[0]);
+            $("#imagePreview").attr("src", fileUrl);
+          }
+        });
+
+        const videoInput = document.getElementById("videoUpload");
+        const videoPreview = document.getElementById('videoPreview');        
+        $ ("#videoUpload").change(function () {
+          const fileUrl = window.URL.createObjectURL(videoInput.files[0]);
+          $("#videoPreview").attr("src", fileUrl);
+        });
+
+        function resetVideo(){
+          videoInput.value=null;
+          $("#videoPreview").attr("src", "<%= videoPath %>");
+        }
+
+      </script>
     </body>
     </html>

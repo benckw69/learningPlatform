@@ -10,6 +10,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const server_db = process.env['server_db'];
 const client = new MongoClient(process.env['server_url']);
 const users_c = client.db(server_db).collection("users");
+const config = require('./routes/config');
 const passport = require('passport');
 
 var indexRouter = require('./routes/index');

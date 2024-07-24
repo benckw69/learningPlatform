@@ -5,6 +5,12 @@
         <link rel='stylesheet' href='/stylesheets/style.css' />
         <link rel='stylesheet' href='/stylesheets/userView.css' />
         <link rel='stylesheet' href='/stylesheets/backgroundImage.css' />
+        <style>
+            video {
+                max-width: 500px;
+                max-height: 500px;
+            }
+        </style>
     </head>
     <body>
         <div class="content">
@@ -31,10 +37,14 @@
                     <br><br><label for="name"><b>*圖片與影片合共不可超過2GB</b></label><br>
 
                     <br><br><label for="name"><b>上傳圖片</b></label><br>
-                    <input type="file" accept="image/jpg,image/jpeg,image/png" name="photoLink" id="photoLink">
+                    <input type="file" accept="image/jpg,image/jpeg,image/png" name="photoLink" id="imageUpload">
+                    <button type="button" onclick="resetImage()">重設圖片</button><br>
+                    <div id="image"><img src="" style="max-width: 500px;max-height: 500px;" id="imagePreview"></div>
 
-                    <br><br><label for="name"><b>上傳影片</b></label><br>
-                    <input type="file" accept="video/*" name="videoLink" id="videoLink">
+                    <br><label for="name"><b>上傳影片</b></label><br>
+                    <input type="file" accept="video/*" name="videoLink" id="videoUpload">
+                    <button type="button" onclick="resetVideo()">重設影片</button><br>
+                    <div id="video"><video controls id="videoPreview" src=""></video></div>
 
                     <br><br><label for="name"><b>課程價錢</b></label><br/>
                     <input type="number" placeholder="輸入價錢" name="money" id="money" required><br/>
@@ -61,12 +71,38 @@
                   <% } %>
             </form> 
         </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script>
             function rangeChecks(val){
                 if(val<0){
                     alert("價錢不能為負數，請重新輸入");
                     document.getElementById('money').value=2.5; 
               }
+            }
+            const imageInput = document.getElementById("imageUpload");
+            const imagePreview = document.getElementById('imagePreview');
+            function resetImage(){
+                imageInput.value=null;
+                $("#imagePreview").attr('src', '');
+            }
+            $ ("#imageUpload").change(()=> {
+                const file = imageInput.files;
+                if(imageInput.files){
+                    const fileUrl = window.URL.createObjectURL(imageInput.files[0]);
+                    $("#imagePreview").attr("src", fileUrl);
+                }
+            });
+
+            const videoInput = document.getElementById("videoUpload");
+            const videoPreview = document.getElementById('videoPreview');        
+            $ ("#videoUpload").change(function () {
+                const fileUrl = window.URL.createObjectURL(videoInput.files[0]);
+                $("#videoPreview").attr("src", fileUrl);
+            });
+
+            function resetVideo(){
+                videoInput.value=null;
+                $("#videoPreview").attr("src", "");
             }
         </script>
     </body>
