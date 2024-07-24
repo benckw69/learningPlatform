@@ -39,6 +39,7 @@
           <li>簡介： <%= course.introduction %></li>
           <li>價錢： <%= course.money %> </li>
           <li>評價： <%= course.rate || "沒有評分" %> <%="("+(course.rateCount || 0)+")"%> </li>
+          <li>上課人數： <%= course.numOfStudents || 0 %> </li>
         </ul></li>
         <% } %>
         <% }); %></ul>

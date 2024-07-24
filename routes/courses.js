@@ -38,6 +38,10 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
 
         //for courses in database, calculate their related average rating
         courses = await searchRating(courses);
+        for(let i=0; i<courses.length;i++){
+            let numOfStudents = await buyRecords_c.find({courseId:courses[i]._id}).toArray();
+            courses[i].numOfStudents = numOfStudents.length;
+        }
         if(courses) res.render('courses_all',{courses:courses,now, search:{method:"words",param:""}});
     } finally {
         await client.close();
@@ -111,6 +115,11 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
                 
             }
             courses = await searchRating(courses);
+            
+            for(let i=0; i<courses.length;i++){
+                let numOfStudents = await buyRecords_c.find({courseId:courses[i]._id}).toArray();
+                courses[i].numOfStudents = numOfStudents.length;
+            }
             res.render('courses_paid',{courses:courses,now});
         } else {
             res.render('courses_paid',{courses:[],now, message:"你沒有任何購買紀錄！"});
@@ -120,11 +129,10 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
     }
 
 }).get('/myCourses', auth.isloginByTeacher, async(req,res)=>{
-    //only teachers can visit the page.
     try {
         await client.connect();
         //convert author name from _id to username of the author
-        let data = await courses_c.find({author:new ObjectId(req.user._id)}).toArray();
+        let data = await courses_c.find({author:req.user._id}).toArray();
         if(data.length>=1){
         let courseauthor = await users_c.findOne({_id:data[0].author})
         if(courseauthor){
@@ -134,6 +142,11 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             }
         }
         data = await searchRating(data);
+        for(let i=0; i<data.length;i++){
+            let numOfStudents = await buyRecords_c.find({courseId:data[i]._id}).toArray();
+            data[i].numOfStudents = numOfStudents.length;
+
+        }
         res.render("courses_myCourses", {
             courses: data,now
         });
@@ -375,8 +388,6 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             let user = await users_c.findOne({_id:req.user._id});
             let moneyPercentage = await moneyPercentage_c.findOne();
             if (user.money >= course.money) {
-                //學生剩餘錢
-                let balance = user.money -= course.money;
                 //老師增加收入後的錢
                 const teacherIncome = parseInt((course.money*moneyPercentage.percentage/100).toFixed(0));
                 const adminIncome = course.money-teacherIncome;
