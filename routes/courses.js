@@ -16,6 +16,7 @@ const now = new Date();
 const courses_c = client.db(server_db).collection("courses");
 const users_c = client.db(server_db).collection('users');
 const buyRecords_c = client.db(server_db).collection("buyRecords");
+const moneyPercentage_c = client.db(server_db).collection("moneyPercentage");
 
 /* GET courses page. */
 //show all courses, pass course object to ejs. Can see the comments
@@ -372,22 +373,20 @@ router.get('/', auth.isloginByStudent, async (req,res)=>{
             //insert buy record at database.
             let course = await courses_c.findOne({_id:new ObjectId(courseId)});
             let user = await users_c.findOne({_id:req.user._id});
-            let userTeacher = await users_c.findOne({_id:course.author});
-           // console.log(user.money, course.money)
+            let moneyPercentage = await moneyPercentage_c.findOne();
             if (user.money >= course.money) {
-                let canBuy = true;
-                if (canBuy) {
-                    //學生剩餘錢
-                    let balance = user.money -= course.money;
-                    //老師增加收入後的錢
-                    if (userTeacher) {
-                        balanceTeacher= userTeacher.money += course.money;
-                    }
-                    await buyRecords_c.insertOne({userId:req.user._id, courseId:new ObjectId(courseId)});
-                    await users_c.updateOne({_id:req.user._id}, {$set: {money: balance}});
-                    if (userTeacher) await users_c.updateOne({_id:course.author}, {$set: {money: balanceTeacher}});
-                    res.redirect(`/courses/${courseId}?msg=4`)
-                }
+                //學生剩餘錢
+                let balance = user.money -= course.money;
+                //老師增加收入後的錢
+                const teacherIncome = parseInt((course.money*moneyPercentage.percentage/100).toFixed(0));
+                const adminIncome = course.money-teacherIncome;
+                
+                await buyRecords_c.insertOne({userId:req.user._id, courseId:new ObjectId(courseId)});
+                await users_c.updateOne({_id:req.user._id}, {$inc: {money: -course.money}});
+                await users_c.updateOne({_id:course.author}, {$inc: {money: teacherIncome}});
+                await users_c.updateOne({loginMethod:"email",type:"admin"},{$inc:{money:adminIncome}});
+                res.redirect(`/courses/${courseId}?msg=4`)
+                
             } else{ res.redirect(`/courses/${courseId}?msg=5`)}
             
         } finally {

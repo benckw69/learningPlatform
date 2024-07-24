@@ -62,8 +62,9 @@ app.use('/register', registerRouter);
 app.use('/users', usersRouter);
 app.use('/courses',coursesRouter);
 app.use('/moneyTickets',require('./routes/moneyTickets'));
-app.use('/searchTeachers', require('./routes/searchTeachers'))
-app.use('/searchStudents', require('./routes/searchStudents'))
+app.use('/searchTeachers', require('./routes/searchTeachers'));
+app.use('/searchStudents', require('./routes/searchStudents'));
+app.use('/moneyPercentage', require('./routes/moneyPercentage'));
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
