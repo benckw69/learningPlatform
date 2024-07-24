@@ -40,7 +40,7 @@ For admin:
 
 ## Features to be added
 * ~~Admin: Control the percentage allotment of the courses~~(done)
-* Admin: View the deletion records of teachers and students.  Can recover the deletion records.
+* Admin: View the account delete records of teachers and students.  Can recover the delete records.
 * ~~Teachers: View how many students enrolled the course~~(done)
 * Teachers: Request withdrawal of money
 * Adding a page to contact the admin
