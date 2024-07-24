@@ -41,6 +41,7 @@ passport.use(new GoogleStrategy({
 async function verify(req, issuer, profile, cb) {
   //firstly, check whether user exist.
   let type = req.session.type;
+  delete req.session.type;
   try{
     await client.connect();
     let userExist = await users_c.findOne({loginMethod:"google",googleId:profile.id,type:type});
@@ -69,12 +70,13 @@ router.get('/',auth.isNotlogin,(req,res)=>{
 }).get('/google/:type', (req,res,next)=>{
   req.session.type = req.params.type;
   passport.authenticate('google')(req,res,next);
-}).get('/oauth/google',passport.authenticate('google', { failureRedirect: '/login/google/fail', failureMessage: true }), function(req, res) {
+}).get('/oauth/google', function(req, res, next) {
+  return passport.authenticate('google', {failureRedirect: '/google/fail', failureMessage: true })(req,res,next)
+},(req,res,next)=>{
   res.redirect('/');
 }).get('/google/fail',(req,res)=>{
-  let type = res.session.type;
   delete res.session.type;
-  res.redirect('/login?type='+type);
+  res.redirect('/login');
 });
 
 module.exports = router;
